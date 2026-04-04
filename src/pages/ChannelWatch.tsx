@@ -24,7 +24,11 @@ const ChannelWatch = () => {
   }, [activePlayer?.src]);
 
   if (!channel) {
-    return <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center text-white/70">Canal nao encontrado.</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 text-center text-white/70">
+        Canal não encontrado.
+      </div>
+    );
   }
 
   const chooseSource = (id: string) => navigate(`/watch/channel/${channel.slug}?source=${id}`);
@@ -59,7 +63,7 @@ const ChannelWatch = () => {
             onClick={() => navigate("/")}
             className="inline-flex items-center gap-2 rounded-full bg-black/46 px-5 py-3 text-sm text-white/76 backdrop-blur-md transition-colors hover:bg-black/68"
           >
-            <Tv2 size={18} /> Inicio
+            <Tv2 size={18} /> Início
           </button>
         </div>
       </div>
@@ -68,7 +72,7 @@ const ChannelWatch = () => {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 p-4 md:p-6">
           <div className="pointer-events-auto flex flex-col gap-4 rounded-[2rem] bg-black/46 p-5 text-white backdrop-blur-xl md:flex-row md:items-end md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.34em] text-white/48">{channel.badge}</p>
+              <p className="text-xs uppercase tracking-[0.34em] text-white/48">Ao vivo</p>
               <h1 className="mt-2 text-2xl font-semibold">{channel.title}</h1>
               <p className="mt-2 text-sm text-white/55">{channel.tagline}</p>
             </div>
@@ -81,17 +85,17 @@ const ChannelWatch = () => {
       )}
 
       {!activePlayer && playerOptions.length > 0 && (
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(245,197,24,0.18),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.72),rgba(3,3,3,0.96))]">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(239,68,68,0.24),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.72),rgba(3,3,3,0.96))]">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-md" />
           <div className="relative flex min-h-full items-center justify-center px-4 py-24">
             <div className="w-full max-w-5xl">
               <div className="mx-auto max-w-2xl text-center">
                 <p className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] uppercase tracking-[0.38em] text-white/58">
-                  <Radio size={14} /> Escolha sua fonte
+                  <Radio size={14} /> Escolha uma fonte
                 </p>
                 <h1 className="mt-6 text-4xl font-bold tracking-tight text-white md:text-6xl">{channel.title}</h1>
                 <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/62 md:text-base">
-                  Cada canal pode ter duas fontes configuradas. Selecione uma delas para abrir o player.
+                  Selecione a opção que deseja abrir para continuar assistindo.
                 </p>
               </div>
 
@@ -131,17 +135,17 @@ const ChannelWatch = () => {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(229,9,20,0.18),transparent_24%),linear-gradient(180deg,rgba(3,3,3,0.78),rgba(3,3,3,0.96))]">
           <div className="relative flex min-h-full items-center justify-center px-4 py-24">
             <div className="w-full max-w-2xl rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 text-center backdrop-blur-xl">
-              <p className="text-xs uppercase tracking-[0.34em] text-white/42">Canal indisponivel</p>
+              <p className="text-xs uppercase tracking-[0.34em] text-white/42">Canal indisponível</p>
               <h1 className="mt-4 text-3xl font-semibold text-white">{channel.title}</h1>
               <p className="mt-4 text-sm leading-7 text-white/62">
-                Nenhuma fonte esta configurada para este canal. Preencha as duas URLs desse canal no arquivo de ambiente.
+                Nenhuma opção está disponível no momento para este canal.
               </p>
               <div className="mt-6 rounded-[1.4rem] border border-white/8 bg-black/30 p-4 text-left">
-                <p className="text-[11px] uppercase tracking-[0.28em] text-white/38">Diagnostico</p>
+                <p className="text-[11px] uppercase tracking-[0.28em] text-white/38">Diagnóstico</p>
                 <div className="mt-3 space-y-2 text-sm text-white/62">
                   {diagnostics.map((item) => (
                     <p key={item.id}>
-                      {item.label}: {item.configured ? "configurada" : "ausente"}
+                      {item.label}: {item.configured ? "disponível" : "indisponível"}
                     </p>
                   ))}
                 </div>
