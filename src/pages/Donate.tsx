@@ -50,12 +50,14 @@ const Donate = () => {
                 <QrCode size={18} />
                 <p className="text-sm font-medium">QR Code Pix</p>
               </div>
-              <iframe
-                src={DONATION_WIDGET_URL}
-                title="Doação Pix"
-                className="h-[640px] w-full rounded-[1.4rem] border-0 bg-transparent"
-                allow="clipboard-write"
-              />
+              <div className="flex justify-center lg:justify-start">
+                <iframe
+                  src={DONATION_WIDGET_URL}
+                  title="Doação Pix"
+                  className="h-[320px] w-full max-w-[320px] rounded-[1.4rem] border-0 bg-transparent sm:h-[360px] sm:max-w-[360px] md:h-[400px] md:max-w-[400px]"
+                  allow="clipboard-write"
+                />
+              </div>
             </div>
           </div>
         </section>

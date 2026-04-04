@@ -49,12 +49,14 @@ const DisclaimerPopup = () => {
               <p className="text-sm font-medium">Doação via Pix</p>
             </div>
 
-            <iframe
-              src={DONATION_WIDGET_URL}
-              title="Doação Pix"
-              className="h-[420px] w-full rounded-[1.5rem] border-0 bg-transparent"
-              allow="clipboard-write"
-            />
+            <div className="flex justify-center">
+              <iframe
+                src={DONATION_WIDGET_URL}
+                title="Doação Pix"
+                className="h-[280px] w-full max-w-[280px] rounded-[1.5rem] border-0 bg-transparent sm:h-[320px] sm:max-w-[320px]"
+                allow="clipboard-write"
+              />
+            </div>
           </div>
 
           <button
