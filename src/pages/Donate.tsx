@@ -45,19 +45,17 @@ const Donate = () => {
               </div>
             </div>
 
-            <div className="rounded-[1.8rem] border border-white/10 bg-black/35 p-4">
+            <div>
               <div className="mb-4 flex items-center gap-2 text-white/78">
                 <QrCode size={18} />
                 <p className="text-sm font-medium">QR Code Pix</p>
               </div>
-              <div className="overflow-hidden rounded-[1.4rem] border border-white/10 bg-black">
-                <iframe
-                  src={DONATION_WIDGET_URL}
-                  title="Doação Pix"
-                  className="h-[640px] w-full"
-                  allow="clipboard-write"
-                />
-              </div>
+              <iframe
+                src={DONATION_WIDGET_URL}
+                title="Doação Pix"
+                className="h-[640px] w-full rounded-[1.4rem] border-0 bg-transparent"
+                allow="clipboard-write"
+              />
             </div>
           </div>
         </section>
