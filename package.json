@@ -11,6 +11,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest"
+    "engines": {
+      "node": "18.x"
+    }
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
