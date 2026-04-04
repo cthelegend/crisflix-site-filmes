@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FlipButton } from "@/components/ui/flip-button";
+import { Info, Play } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Movie, getBackdropUrl, getTrending } from "@/lib/tmdb";
 
 const HeroBanner = () => {
@@ -44,24 +45,19 @@ const HeroBanner = () => {
             {featured.overview}
           </p>
           <div className="mt-7 flex flex-col gap-3 animate-fade-in sm:flex-row sm:flex-wrap">
-            <FlipButton
+            <Button
               onClick={() => navigate(`/watch/${type}/${featured.id}`)}
-              frontText="Assistir agora"
-              backText="Dar play"
-              from="top"
-              className="h-12 min-w-[220px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.26)]"
-              frontClassName="rounded-full border border-white/14 bg-white text-black"
-              backClassName="rounded-full border border-white bg-black text-white"
-            />
-            <FlipButton
+              className="h-12 rounded-full border border-white bg-white px-7 text-sm font-semibold text-black transition-colors duration-200 hover:bg-black hover:text-white"
+            >
+              <Play size={18} fill="currentColor" /> Assistir agora
+            </Button>
+            <Button
               onClick={() => navigate(`/details/${type}/${featured.id}`)}
-              frontText="Mais informacoes"
-              backText="Ver detalhes"
-              from="bottom"
-              className="h-12 min-w-[220px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.22)]"
-              frontClassName="rounded-full border border-white/14 bg-white/12 text-white backdrop-blur-md"
-              backClassName="rounded-full border border-white bg-white text-black"
-            />
+              variant="secondary"
+              className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
+            >
+              <Info size={18} /> Mais informações
+            </Button>
           </div>
         </div>
       </div>

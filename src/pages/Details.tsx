@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock3, Play, Users2 } from "lucide-react";
-import { FlipButton } from "@/components/ui/flip-button";
+import { ArrowLeft, Calendar, Clock3, ExternalLink, Play, SkipForward, Users2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import { buildWatchPath, getContinueWatchingItem } from "@/lib/continueWatching";
@@ -204,50 +204,42 @@ const Details = () => {
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <FlipButton
+                <Button
                   onClick={() => handlePlay(isTV ? selectedSeason : undefined, isTV ? 1 : undefined)}
-                  frontText="Assistir"
-                  backText="Abrir player"
-                  from="top"
-                  className="h-12 min-w-[210px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.26)]"
-                  frontClassName="rounded-full border border-white/14 bg-white text-black"
-                  backClassName="rounded-full border border-white bg-black text-white"
-                />
+                  className="h-12 rounded-full border border-white bg-white px-7 text-sm font-semibold text-black transition-colors duration-200 hover:bg-black hover:text-white"
+                >
+                  <Play size={18} fill="currentColor" /> Assistir
+                </Button>
 
                 {resumeItem && (
-                  <FlipButton
+                  <Button
                     onClick={handleResume}
-                    frontText="Continuar assistindo"
-                    backText="Voltar ao ponto"
-                    from="bottom"
-                    className="h-12 min-w-[250px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.22)]"
-                    frontClassName="rounded-full border border-white/14 bg-white/12 text-white backdrop-blur-md"
-                    backClassName="rounded-full border border-white bg-white text-black"
-                  />
+                    variant="secondary"
+                    className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
+                  >
+                    <Play size={18} /> Continuar assistindo
+                  </Button>
                 )}
 
                 {isTV && resumeItem?.nextEpisode && (
-                  <FlipButton
+                  <Button
                     onClick={handleNextEpisode}
-                    frontText="Proximo episodio"
-                    backText="Seguir maratona"
-                    from="left"
-                    className="h-12 min-w-[220px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.22)]"
-                    frontClassName="rounded-full border border-white/14 bg-white/12 text-white backdrop-blur-md"
-                    backClassName="rounded-full border border-white bg-white text-black"
-                  />
+                    variant="secondary"
+                    className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
+                  >
+                    <SkipForward size={18} /> Próximo episódio
+                  </Button>
                 )}
 
                 {imdbUrl && (
-                  <FlipButton
-                    onClick={() => window.open(imdbUrl, "_blank", "noopener,noreferrer")}
-                    frontText="Ver no IMDb"
-                    backText="Abrir ficha"
-                    from="right"
-                    className="h-12 min-w-[210px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(245,197,24,0.14)]"
-                    frontClassName="rounded-full border border-white/14 bg-white/8 text-white backdrop-blur-md"
-                    backClassName="rounded-full border border-[#f5c518] bg-[#f5c518] text-black"
-                  />
+                  <a
+                    href={imdbUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white bg-black px-6 text-sm font-semibold text-white transition-colors duration-200 hover:border-[#f5c518] hover:bg-[#f5c518] hover:text-black"
+                  >
+                    Ver no IMDb <ExternalLink size={16} />
+                  </a>
                 )}
               </div>
             </div>
