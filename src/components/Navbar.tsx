@@ -57,6 +57,9 @@ const Navbar = () => {
             <Link to="/browse/tv" className="transition-colors hover:text-white">
               Séries
             </Link>
+            <Link to="/channels" className="transition-colors hover:text-white">
+              Canais
+            </Link>
             <Link to="/legal/dmca" className="transition-colors hover:text-white">
               DMCA
             </Link>
@@ -111,6 +114,9 @@ const Navbar = () => {
             </Link>
             <Link to="/browse/tv" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
               Séries
+            </Link>
+            <Link to="/channels" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
+              Canais
             </Link>
             <Link to="/legal/dmca" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
               DMCA, termos e cookies

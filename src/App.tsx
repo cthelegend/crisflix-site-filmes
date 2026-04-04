@@ -10,6 +10,8 @@ import SearchPage from "./pages/SearchPage";
 import Browse from "./pages/Browse";
 import NotFound from "./pages/NotFound";
 import DmcaTerms from "./pages/DmcaTerms";
+import Channels from "./pages/Channels";
+import ChannelWatch from "./pages/ChannelWatch";
 
 const queryClient = new QueryClient();
 
@@ -25,6 +27,8 @@ const App = () => (
           <Route path="/watch/:type/:id" element={<Watch />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/browse/:category" element={<Browse />} />
+          <Route path="/channels" element={<Channels />} />
+          <Route path="/watch/channel/:slug" element={<ChannelWatch />} />
           <Route path="/legal/dmca" element={<DmcaTerms />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
