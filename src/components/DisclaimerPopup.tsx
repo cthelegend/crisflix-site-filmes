@@ -20,12 +20,12 @@ const DisclaimerPopup = () => {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/72 px-4 backdrop-blur-xl animate-fade-in">
-      <div className="w-full max-w-2xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#111111]/95 shadow-[0_30px_120px_rgba(0,0,0,0.5)]">
-        <div className="bg-[radial-gradient(circle_at_top_right,rgba(229,9,20,0.2),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)] p-6 md:p-8">
+      <div className="max-h-[88svh] w-full max-w-xl overflow-y-auto rounded-[2rem] border border-white/10 bg-[#111111]/95 shadow-[0_30px_120px_rgba(0,0,0,0.5)]">
+        <div className="bg-[radial-gradient(circle_at_top_right,rgba(229,9,20,0.2),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)] p-5 md:p-8">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.34em] text-white/45">Aviso</p>
-              <h2 className="mt-2 text-2xl font-bold text-white md:text-3xl">Projeto sem fins lucrativos</h2>
+              <h2 className="mt-2 text-xl font-bold text-white sm:text-2xl md:text-3xl">Projeto sem fins lucrativos</h2>
             </div>
             <button onClick={handleClose} className="text-white/50 transition-colors hover:text-white">
               <X size={20} />
@@ -33,12 +33,12 @@ const DisclaimerPopup = () => {
           </div>
 
           <div className="mt-6">
-            <p className="text-sm leading-7 text-white/78 md:text-base">
+            <p className="text-sm leading-6 text-white/78 md:text-base md:leading-7">
               O <span className="font-semibold text-primary">CRISFLIX</span> é um projeto independente, criado para fins
               educacionais e mantido sem objetivos comerciais.
             </p>
 
-            <p className="mt-4 text-sm leading-7 text-white/70 md:text-base">
+            <p className="mt-4 text-sm leading-6 text-white/70 md:text-base md:leading-7">
               Se você curte a proposta e quiser apoiar a manutenção do projeto, pode contribuir com uma doação via Pix.
             </p>
           </div>
@@ -50,12 +50,14 @@ const DisclaimerPopup = () => {
             </div>
 
             <div className="flex justify-center">
-              <iframe
-                src={DONATION_WIDGET_URL}
-                title="Doação Pix"
-                className="h-[280px] w-full max-w-[280px] rounded-[1.5rem] border-0 bg-transparent sm:h-[320px] sm:max-w-[320px]"
-                allow="clipboard-write"
-              />
+              <div className="w-[220px] overflow-hidden sm:w-[280px]">
+                <iframe
+                  src={DONATION_WIDGET_URL}
+                  title="Doação Pix"
+                  className="h-[320px] w-[320px] origin-top-left scale-[0.69] rounded-[1.5rem] border-0 bg-transparent sm:h-[320px] sm:w-[320px] sm:scale-[0.875]"
+                  allow="clipboard-write"
+                />
+              </div>
             </div>
           </div>
 
@@ -66,7 +68,7 @@ const DisclaimerPopup = () => {
             Entendi
           </button>
 
-          <div className="mt-6 border-t border-white/8 pt-4 text-xs leading-6 text-white/46">
+          <div className="mt-5 border-t border-white/8 pt-4 text-[11px] leading-5 text-white/46 sm:text-xs sm:leading-6">
             <p className="font-medium text-white/56">Remoção de conteúdo</p>
             <p className="mt-1">
               Não hospedamos, armazenamos ou distribuímos conteúdo protegido por direitos autorais. Caso você seja detentor de
