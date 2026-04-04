@@ -47,14 +47,14 @@ const HeroBanner = () => {
           <div className="mt-7 flex flex-col gap-3 animate-fade-in sm:flex-row sm:flex-wrap">
             <Button
               onClick={() => navigate(`/watch/${type}/${featured.id}`)}
-              className="h-12 rounded-full bg-white px-7 text-sm font-semibold text-black hover:bg-white/90"
+              className="cta-hover-primary h-12 rounded-full bg-white px-7 text-sm font-semibold text-black"
             >
               <Play size={18} fill="currentColor" /> Assistir agora
             </Button>
             <Button
               variant="secondary"
               onClick={() => navigate(`/details/${type}/${featured.id}`)}
-              className="h-12 rounded-full bg-white/14 px-7 text-sm font-semibold text-white backdrop-blur-md hover:bg-white/22"
+              className="cta-hover-glass h-12 rounded-full bg-white/14 px-7 text-sm font-semibold text-white backdrop-blur-md"
             >
               <Info size={18} /> Mais informações
             </Button>

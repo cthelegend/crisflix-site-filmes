@@ -185,7 +185,7 @@ const Details = () => {
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button
                   onClick={() => handlePlay(isTV ? selectedSeason : undefined, isTV ? 1 : undefined)}
-                  className="h-12 rounded-full bg-white px-7 text-sm font-semibold text-black hover:bg-white/90"
+                  className="cta-hover-primary h-12 rounded-full bg-white px-7 text-sm font-semibold text-black"
                 >
                   <Play size={18} fill="currentColor" /> Assistir
                 </Button>
@@ -194,7 +194,7 @@ const Details = () => {
                   <Button
                     variant="secondary"
                     onClick={handleResume}
-                    className="h-12 rounded-full bg-white/12 px-7 text-sm font-semibold text-white backdrop-blur-md hover:bg-white/18"
+                    className="cta-hover-glass h-12 rounded-full bg-white/12 px-7 text-sm font-semibold text-white backdrop-blur-md"
                   >
                     <Play size={18} /> Continuar assistindo
                   </Button>
@@ -204,7 +204,7 @@ const Details = () => {
                   <Button
                     variant="secondary"
                     onClick={handleNextEpisode}
-                    className="h-12 rounded-full bg-white/12 px-7 text-sm font-semibold text-white backdrop-blur-md hover:bg-white/18"
+                    className="cta-hover-glass h-12 rounded-full bg-white/12 px-7 text-sm font-semibold text-white backdrop-blur-md"
                   >
                     <SkipForward size={18} /> Próximo episódio
                   </Button>
@@ -215,7 +215,7 @@ const Details = () => {
                     href={imdbUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex h-12 items-center gap-2 rounded-full border border-white/14 bg-white/6 px-6 text-sm text-white/88 backdrop-blur-md transition-colors hover:bg-white/12"
+                    className="cta-hover-imdb inline-flex h-12 items-center gap-2 rounded-full border border-white/14 bg-white/6 px-6 text-sm text-white/88 backdrop-blur-md"
                   >
                     Ver no IMDb <ExternalLink size={16} />
                   </a>
@@ -327,7 +327,7 @@ const Details = () => {
                 <button
                   key={ep.episode_number}
                   onClick={() => handlePlay(selectedSeason, ep.episode_number)}
-                  className="group grid w-full gap-4 rounded-[1.6rem] bg-white/[0.04] p-3 text-left transition-colors hover:bg-white/[0.08] md:grid-cols-[156px_minmax(0,1fr)_auto] md:items-center"
+                  className="group grid w-full gap-4 rounded-[1.6rem] bg-white/[0.04] p-3 text-left transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-white/[0.08] hover:shadow-[0_18px_40px_rgba(0,0,0,0.18)] md:grid-cols-[156px_minmax(0,1fr)_auto] md:items-center"
                 >
                   <div className="relative h-24 overflow-hidden rounded-[1.2rem] bg-secondary">
                     {ep.still_path ? (
@@ -347,7 +347,7 @@ const Details = () => {
                     </p>
                   </div>
 
-                  <div className="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-2 text-sm text-white/76 group-hover:bg-white/14">
+                  <div className="inline-flex items-center justify-center rounded-full bg-white/10 px-4 py-2 text-sm text-white/76 transition-all duration-300 group-hover:bg-white/18 group-hover:text-white group-hover:shadow-[0_12px_28px_rgba(255,255,255,0.08)]">
                     <Play size={14} className="mr-2" fill="currentColor" /> Assistir
                   </div>
                 </button>
