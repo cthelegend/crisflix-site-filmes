@@ -43,30 +43,32 @@ const DisclaimerPopup = () => {
             </p>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-4 md:mt-5">
             <div className="mb-2 flex items-center gap-2 text-white/72">
               <QrCode size={18} />
               <p className="text-sm font-medium">Doação via Pix</p>
             </div>
 
             <div className="flex justify-center">
-              <div className="w-[188px] overflow-hidden sm:w-[240px]">
+              <div className="w-[152px] overflow-hidden sm:w-[220px] md:w-[240px]">
                 <iframe
                   src={DONATION_WIDGET_URL}
                   title="Doação Pix"
-                  className="h-[272px] w-[272px] origin-top-left scale-[0.69] rounded-[1.5rem] border-0 bg-transparent sm:h-[320px] sm:w-[320px] sm:scale-[0.75]"
+                  className="h-[232px] w-[232px] origin-top-left scale-[0.655] rounded-[1.5rem] border-0 bg-transparent sm:h-[300px] sm:w-[300px] sm:scale-[0.73] md:h-[320px] md:w-[320px] md:scale-[0.75]"
                   allow="clipboard-write"
                 />
               </div>
             </div>
           </div>
 
-          <button
-            onClick={handleClose}
-            className="mt-5 inline-flex h-11 items-center justify-center rounded-full border border-white bg-white px-6 text-sm font-semibold text-black transition-colors hover:bg-black hover:text-white"
-          >
-            Entendi
-          </button>
+          <div className="mt-3 flex justify-center md:mt-4">
+            <button
+              onClick={handleClose}
+              className="inline-flex h-11 items-center justify-center rounded-full border border-white bg-white px-6 text-sm font-semibold text-black transition-colors hover:bg-black hover:text-white"
+            >
+              Entendi
+            </button>
+          </div>
 
           <div className="mt-4 border-t border-white/8 pt-3 text-[10px] leading-5 text-white/46 sm:text-[11px]">
             <p className="font-medium text-white/56">Remoção de conteúdo</p>
