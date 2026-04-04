@@ -334,8 +334,8 @@ const Details = () => {
                 <p className="text-xs uppercase tracking-[0.32em] text-white/42">Temporadas</p>
                 <h2 className="mt-2 text-2xl font-semibold text-white">Episodios</h2>
               </div>
-              <div className="overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
-                <div className="inline-flex min-w-full gap-3 rounded-full bg-white/[0.04] p-2">
+              <div className="overflow-x-auto pb-3" style={{ scrollbarWidth: "thin" }}>
+                <div className="inline-flex min-w-max gap-3 rounded-full bg-white/[0.04] p-2">
                   {seasonsList.map((item) => (
                     <button
                       key={item.season_number}

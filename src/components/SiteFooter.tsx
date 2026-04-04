@@ -9,7 +9,7 @@ const SiteFooter = () => {
             CRISFLIX
           </p>
           <p className="mt-3 max-w-2xl text-sm leading-7 text-white/44">
-            Catálogo com informações detalhadas de filmes e séries.
+            Catálogo com informações detalhadas de filmes, séries e canais esportivos.
           </p>
         </div>
 
@@ -17,6 +17,8 @@ const SiteFooter = () => {
           <Link to="/" className="transition-colors hover:text-white">Início</Link>
           <Link to="/browse/movies" className="transition-colors hover:text-white">Filmes</Link>
           <Link to="/browse/tv" className="transition-colors hover:text-white">Séries</Link>
+          <Link to="/channels" className="transition-colors hover:text-white">Canais</Link>
+          <Link to="/donate" className="transition-colors hover:text-white">Doar</Link>
           <Link to="/legal/dmca" className="transition-colors hover:text-white">DMCA</Link>
         </div>
       </div>
