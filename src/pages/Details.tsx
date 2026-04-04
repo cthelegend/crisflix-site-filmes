@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock3, ExternalLink, Play, SkipForward, Users2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ArrowLeft, Calendar, Clock3, Play, Users2 } from "lucide-react";
+import { FlipButton } from "@/components/ui/flip-button";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import { buildWatchPath, getContinueWatchingItem } from "@/lib/continueWatching";
@@ -20,13 +20,13 @@ import {
 const formatDate = (date?: string) =>
   date
     ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date(`${date}T00:00:00`))
-    : "Não informado";
+    : "Nao informado";
 
 const formatList = (items?: string[]) =>
-  items && items.length > 0 ? items.join(", ") : "Não informado";
+  items && items.length > 0 ? items.join(", ") : "Nao informado";
 
 const formatDuration = (runtime?: number) => {
-  if (!runtime) return "Não informado";
+  if (!runtime) return "Nao informado";
   if (runtime < 60) return `${runtime}min`;
   return `${Math.floor(runtime / 60)}h ${runtime % 60}min`;
 };
@@ -44,7 +44,9 @@ const Details = () => {
   const [details, setDetails] = useState<MovieDetails | null>(null);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [season, setSeason] = useState<Season | null>(null);
-  const [resumeItem, setResumeItem] = useState(() => getContinueWatchingItem((type as "movie" | "tv") || "movie", Number(id)));
+  const [resumeItem, setResumeItem] = useState(() =>
+    getContinueWatchingItem((type as "movie" | "tv") || "movie", Number(id)),
+  );
   const navigate = useNavigate();
 
   const numId = Number(id);
@@ -55,7 +57,8 @@ const Details = () => {
       const data = isTV ? await getTVDetails(numId) : await getMovieDetails(numId);
       setDetails(data);
       if (isTV && data.seasons?.length) {
-        const firstPlayableSeason = data.seasons.find((item) => item.season_number > 0)?.season_number || 1;
+        const firstPlayableSeason =
+          data.seasons.find((item) => item.season_number > 0)?.season_number || 1;
         setSelectedSeason(firstPlayableSeason);
       }
     };
@@ -102,7 +105,11 @@ const Details = () => {
   );
 
   if (!details) {
-    return <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">Carregando...</div>;
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background text-muted-foreground">
+        Carregando...
+      </div>
+    );
   }
 
   const handlePlay = (seasonNum?: number, episodeNum?: number) => {
@@ -128,7 +135,14 @@ const Details = () => {
 
   const handleNextEpisode = () => {
     if (!resumeItem?.nextEpisode) return;
-    navigate(buildWatchPath({ type: "tv", id: numId, season: resumeItem.nextEpisode.season, episode: resumeItem.nextEpisode.episode }));
+    navigate(
+      buildWatchPath({
+        type: "tv",
+        id: numId,
+        season: resumeItem.nextEpisode.season,
+        episode: resumeItem.nextEpisode.episode,
+      }),
+    );
   };
 
   return (
@@ -144,7 +158,10 @@ const Details = () => {
         <div className="absolute inset-x-0 bottom-0 h-64 gradient-fade-bottom" />
 
         <div className="relative z-10 px-4 pb-16 pt-28 md:px-12 md:pb-24">
-          <button onClick={() => navigate(-1)} className="mb-10 inline-flex items-center gap-2 text-sm text-white/74 transition-colors hover:text-white">
+          <button
+            onClick={() => navigate(-1)}
+            className="mb-10 inline-flex items-center gap-2 text-sm text-white/74 transition-colors hover:text-white"
+          >
             <ArrowLeft size={16} /> Voltar
           </button>
 
@@ -159,9 +176,9 @@ const Details = () => {
 
             <div className="max-w-4xl">
               <div className="mb-4 flex flex-wrap items-center gap-3 text-[11px] uppercase tracking-[0.35em] text-white/60">
-                <span>{isTV ? "Série" : "Filme"}</span>
+                <span>{isTV ? "Serie" : "Filme"}</span>
                 {year && <span>{year}</span>}
-                <span>{details.status || "Catálogo"}</span>
+                <span>{details.status || "Catalogo"}</span>
               </div>
 
               <h1 className="text-4xl font-bold leading-none tracking-tight text-white text-shadow md:text-7xl">
@@ -171,54 +188,66 @@ const Details = () => {
 
               <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/82">
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#f5c518] px-4 py-2 font-semibold text-black">
-                  <span className="rounded-[0.45rem] bg-black px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-[#f5c518]">IMDb</span>
+                  <span className="rounded-[0.45rem] bg-black px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-[#f5c518]">
+                    IMDb
+                  </span>
                   {formatDisplayedRating(details.vote_average)}
                 </span>
                 <span className="rounded-full bg-white/10 px-4 py-2 backdrop-blur-md">{formatDuration(runtime)}</span>
-                <span className="rounded-full bg-white/10 px-4 py-2 backdrop-blur-md">{details.genres?.slice(0, 3).map((genre) => genre.name).join(" • ")}</span>
+                <span className="rounded-full bg-white/10 px-4 py-2 backdrop-blur-md">
+                  {details.genres?.slice(0, 3).map((genre) => genre.name).join(" • ")}
+                </span>
               </div>
 
               <p className="mt-6 max-w-3xl text-sm leading-7 text-white/76 md:text-base">
-                {details.overview || "Sinopse não informada."}
+                {details.overview || "Sinopse nao informada."}
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button
+                <FlipButton
                   onClick={() => handlePlay(isTV ? selectedSeason : undefined, isTV ? 1 : undefined)}
-                  className="cta-hover-primary h-12 rounded-full bg-white px-7 text-sm font-semibold text-black"
-                >
-                  <Play size={18} fill="currentColor" /> Assistir
-                </Button>
+                  frontText="Assistir"
+                  backText="Abrir player"
+                  from="top"
+                  className="h-12 min-w-[210px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.26)]"
+                  frontClassName="rounded-full border border-white/14 bg-white text-black"
+                  backClassName="rounded-full border border-white bg-black text-white"
+                />
 
                 {resumeItem && (
-                  <Button
-                    variant="secondary"
+                  <FlipButton
                     onClick={handleResume}
-                    className="cta-hover-glass h-12 rounded-full bg-white/12 px-7 text-sm font-semibold text-white backdrop-blur-md"
-                  >
-                    <Play size={18} /> Continuar assistindo
-                  </Button>
+                    frontText="Continuar assistindo"
+                    backText="Voltar ao ponto"
+                    from="bottom"
+                    className="h-12 min-w-[250px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.22)]"
+                    frontClassName="rounded-full border border-white/14 bg-white/12 text-white backdrop-blur-md"
+                    backClassName="rounded-full border border-white bg-white text-black"
+                  />
                 )}
 
                 {isTV && resumeItem?.nextEpisode && (
-                  <Button
-                    variant="secondary"
+                  <FlipButton
                     onClick={handleNextEpisode}
-                    className="cta-hover-glass h-12 rounded-full bg-white/12 px-7 text-sm font-semibold text-white backdrop-blur-md"
-                  >
-                    <SkipForward size={18} /> Próximo episódio
-                  </Button>
+                    frontText="Proximo episodio"
+                    backText="Seguir maratona"
+                    from="left"
+                    className="h-12 min-w-[220px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(0,0,0,0.22)]"
+                    frontClassName="rounded-full border border-white/14 bg-white/12 text-white backdrop-blur-md"
+                    backClassName="rounded-full border border-white bg-white text-black"
+                  />
                 )}
 
                 {imdbUrl && (
-                  <a
-                    href={imdbUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="cta-hover-imdb inline-flex h-12 items-center gap-2 rounded-full border border-white/14 bg-white/6 px-6 text-sm text-white/88 backdrop-blur-md"
-                  >
-                    Ver no IMDb <ExternalLink size={16} />
-                  </a>
+                  <FlipButton
+                    onClick={() => window.open(imdbUrl, "_blank", "noopener,noreferrer")}
+                    frontText="Ver no IMDb"
+                    backText="Abrir ficha"
+                    from="right"
+                    className="h-12 min-w-[210px] overflow-hidden rounded-full px-0 text-sm font-semibold shadow-[0_18px_48px_rgba(245,197,24,0.14)]"
+                    frontClassName="rounded-full border border-white/14 bg-white/8 text-white backdrop-blur-md"
+                    backClassName="rounded-full border border-[#f5c518] bg-[#f5c518] text-black"
+                  />
                 )}
               </div>
             </div>
@@ -231,7 +260,9 @@ const Details = () => {
           <div className="rounded-[2rem] bg-white/[0.045] p-6 backdrop-blur-xl">
             <div className="flex flex-wrap items-center gap-4 text-sm text-white/76">
               <div className="inline-flex items-center gap-2 rounded-full bg-[#f5c518] px-3 py-1.5 font-semibold text-black">
-                <span className="rounded-[0.35rem] bg-black px-1.5 py-0.5 text-[9px] uppercase tracking-[0.18em] text-[#f5c518]">IMDb</span>
+                <span className="rounded-[0.35rem] bg-black px-1.5 py-0.5 text-[9px] uppercase tracking-[0.18em] text-[#f5c518]">
+                  IMDb
+                </span>
                 <span>{formatDisplayedRating(details.vote_average)}</span>
               </div>
               <div className="h-1 w-1 rounded-full bg-white/25" />
@@ -248,20 +279,28 @@ const Details = () => {
 
             <div className="mt-8 grid gap-8 md:grid-cols-2">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Direção</p>
-                <p className="mt-2 text-base text-white/88">{formatList(isTV ? details.created_by?.map((item) => item.name) : directors)}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Direcao</p>
+                <p className="mt-2 text-base text-white/88">
+                  {formatList(isTV ? details.created_by?.map((item) => item.name) : directors)}
+                </p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-white/42">Roteiro</p>
-                <p className="mt-2 text-base text-white/88">{formatList(writers.length ? writers : details.created_by?.map((item) => item.name))}</p>
+                <p className="mt-2 text-base text-white/88">
+                  {formatList(writers.length ? writers : details.created_by?.map((item) => item.name))}
+                </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Título original</p>
-                <p className="mt-2 text-base text-white/88">{details.original_title || details.original_name || "Não informado"}</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Titulo original</p>
+                <p className="mt-2 text-base text-white/88">
+                  {details.original_title || details.original_name || "Nao informado"}
+                </p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-white/42">Idioma original</p>
-                <p className="mt-2 text-base text-white/88">{details.original_language?.toUpperCase() || "Não informado"}</p>
+                <p className="mt-2 text-base text-white/88">
+                  {details.original_language?.toUpperCase() || "Nao informado"}
+                </p>
               </div>
             </div>
           </div>
@@ -276,7 +315,7 @@ const Details = () => {
                 <div key={person.id} className="flex items-start justify-between gap-4 border-b border-white/6 pb-4 last:border-b-0">
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-white">{person.name}</p>
-                    <p className="mt-1 text-sm text-white/52">{person.character || "Personagem não informado"}</p>
+                    <p className="mt-1 text-sm text-white/52">{person.character || "Personagem nao informado"}</p>
                   </div>
                   {person.profile_path ? (
                     <img
@@ -301,7 +340,7 @@ const Details = () => {
             <div className="mb-6 flex flex-col gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.32em] text-white/42">Temporadas</p>
-                <h2 className="mt-2 text-2xl font-semibold text-white">Episódios</h2>
+                <h2 className="mt-2 text-2xl font-semibold text-white">Episodios</h2>
               </div>
               <div className="overflow-x-auto pb-2" style={{ scrollbarWidth: "none" }}>
                 <div className="inline-flex min-w-full gap-3 rounded-full bg-white/[0.04] p-2">
@@ -334,16 +373,16 @@ const Details = () => {
                       <img src={getImageUrl(ep.still_path, "w300")} alt="" className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.3em] text-white/35">
-                        Episódio
+                        Episodio
                       </div>
                     )}
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-xs uppercase tracking-[0.28em] text-white/42">Episódio {ep.episode_number}</p>
+                    <p className="text-xs uppercase tracking-[0.28em] text-white/42">Episodio {ep.episode_number}</p>
                     <p className="mt-1 text-base font-medium text-white">{ep.name}</p>
                     <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/56">
-                      {ep.overview || "Resumo não informado."}
+                      {ep.overview || "Resumo nao informado."}
                     </p>
                   </div>
 
@@ -359,10 +398,10 @@ const Details = () => {
         <section className="mt-10 rounded-[2rem] bg-white/[0.025] p-6 text-white/66">
           <h2 className="text-xl font-semibold text-white">Avisos legais</h2>
           <p className="mt-3 max-w-2xl text-sm leading-7">
-            Para notificações DMCA, termos de uso e política de remoção de conteúdo, acesse a página legal completa do projeto.
+            Para notificacoes DMCA, termos de uso e politica de remocao de conteudo, acesse a pagina legal completa do projeto.
           </p>
           <Link to="/legal/dmca" className="mt-4 inline-flex text-sm text-primary hover:text-primary/80">
-            Abrir página de DMCA e Termos
+            Abrir pagina de DMCA e Termos
           </Link>
         </section>
       </main>

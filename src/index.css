@@ -94,13 +94,4 @@
   .row-mask {
     mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
   }
-  .cta-hover-primary {
-    @apply transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:bg-white hover:shadow-[0_18px_44px_rgba(255,255,255,0.22)];
-  }
-  .cta-hover-glass {
-    @apply transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:border-white/25 hover:bg-[white]/[0.20] hover:text-white hover:shadow-[0_18px_42px_rgba(0,0,0,0.28)];
-  }
-  .cta-hover-imdb {
-    @apply transition-all duration-300 ease-out hover:-translate-y-0.5 hover:scale-[1.02] hover:border-[#f5c518]/40 hover:bg-[#f5c518]/[0.14] hover:text-white hover:shadow-[0_18px_42px_rgba(245,197,24,0.18)];
-  }
 }
