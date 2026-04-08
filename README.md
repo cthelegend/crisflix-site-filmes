@@ -4,7 +4,7 @@
 Plataforma de streaming inspirada na Netflix, desenvolvida para exibição de filmes, séries e conteúdos em uma interface moderna, rápida e responsiva.
 
 🔗 **Acesse o projeto:**
-👉 [Acssar](https://crissflix.vercel.app/)
+👉 [Acessar](https://crissflix.vercel.app/)
 
 ---
 
@@ -87,7 +87,7 @@ MIT
 ## 👨‍💻 Autor
 
 Desenvolvido por **cris15k**
-🔗 [https://github.com/cthelegend](https://github.com/cthelegend)
+🔗 [cris15k](https://github.com/cthelegend)
 
 ---
 
