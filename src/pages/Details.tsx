@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, Calendar, Clock3, ExternalLink, Play, SkipForward, Users2 } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, Calendar, Check, Clock3, ExternalLink, Heart, Play, SkipForward, Users2 } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
+import { useAuth } from "@/contexts/AuthContext";
 import { buildWatchPath, getContinueWatchingItem } from "@/lib/continueWatching";
 import {
   MovieDetails,
@@ -16,6 +18,7 @@ import {
   getTVDetails,
   getTVSeason,
 } from "@/lib/tmdb";
+import { fetchUserMediaState, toggleFavorite, toggleWatchlist, UserMediaState } from "@/lib/userMedia";
 
 const formatDate = (date?: string) =>
   date
@@ -47,7 +50,9 @@ const Details = () => {
   const [resumeItem, setResumeItem] = useState(() =>
     getContinueWatchingItem((type as "movie" | "tv") || "movie", Number(id)),
   );
+  const [savedState, setSavedState] = useState<UserMediaState | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const numId = Number(id);
   const isTV = type === "tv";
@@ -78,6 +83,17 @@ const Details = () => {
     window.addEventListener("continue-watching-updated", syncResume);
     return () => window.removeEventListener("continue-watching-updated", syncResume);
   }, [isTV, numId]);
+
+  useEffect(() => {
+    if (!user || !numId) {
+      setSavedState(null);
+      return;
+    }
+
+    fetchUserMediaState(user.id, isTV ? "tv" : "movie", numId)
+      .then(setSavedState)
+      .catch(() => setSavedState(null));
+  }, [isTV, numId, user]);
 
   const title = details?.title || details?.name || "";
   const year = (details?.release_date || details?.first_air_date || "").slice(0, 4);
@@ -143,6 +159,51 @@ const Details = () => {
         episode: resumeItem.nextEpisode.episode,
       }),
     );
+  };
+
+  const mediaIdentity = details
+    ? {
+        media_type: isTV ? "tv" as const : "movie" as const,
+        media_id: numId,
+        title,
+        poster_path: details.poster_path,
+        backdrop_path: details.backdrop_path,
+        vote_average: details.vote_average,
+        release_date: details.release_date || null,
+        first_air_date: details.first_air_date || null,
+      }
+    : null;
+
+  const handleToggleFavorite = async () => {
+    if (!user || !mediaIdentity) {
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      const nextValue = !savedState?.is_favorite;
+      const next = await toggleFavorite(user.id, mediaIdentity, nextValue);
+      setSavedState(next);
+      toast.success(nextValue ? "Adicionado aos favoritos." : "Removido dos favoritos.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível atualizar seus favoritos.");
+    }
+  };
+
+  const handleToggleWatchlist = async () => {
+    if (!user || !mediaIdentity) {
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      const nextValue = !savedState?.in_watchlist;
+      const next = await toggleWatchlist(user.id, mediaIdentity, nextValue);
+      setSavedState(next);
+      toast.success(nextValue ? "Adicionado à sua lista." : "Removido da sua lista.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Não foi possível atualizar sua lista.");
+    }
   };
 
   return (
@@ -241,6 +302,24 @@ const Details = () => {
                     Ver no IMDb <ExternalLink size={16} />
                   </a>
                 )}
+
+                <Button
+                  onClick={handleToggleFavorite}
+                  variant="secondary"
+                  className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
+                >
+                  <Heart size={18} className={savedState?.is_favorite ? "fill-current" : ""} />
+                  {savedState?.is_favorite ? "Favoritado" : "Favoritar"}
+                </Button>
+
+                <Button
+                  onClick={handleToggleWatchlist}
+                  variant="secondary"
+                  className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
+                >
+                  {savedState?.in_watchlist ? <Check size={18} /> : <BookmarkPlus size={18} />}
+                  {savedState?.in_watchlist ? "Na minha lista" : "Minha lista"}
+                </Button>
               </div>
             </div>
           </div>

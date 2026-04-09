@@ -2,18 +2,28 @@ import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ContinueWatchingCard from "@/components/ContinueWatchingCard";
 import { ContinueWatchingEntry, getContinueWatching } from "@/lib/continueWatching";
+import { useAuth } from "@/contexts/AuthContext";
+import { fetchRemoteContinueWatching } from "@/lib/userMedia";
 
 const ContinueWatchingRow = () => {
   const [items, setItems] = useState<ContinueWatchingEntry[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const sync = () => setItems(getContinueWatching());
+    const sync = async () => {
+      if (user) {
+        setItems(await fetchRemoteContinueWatching(user.id));
+        return;
+      }
+
+      setItems(getContinueWatching());
+    };
 
     sync();
     window.addEventListener("continue-watching-updated", sync);
     return () => window.removeEventListener("continue-watching-updated", sync);
-  }, []);
+  }, [user]);
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;

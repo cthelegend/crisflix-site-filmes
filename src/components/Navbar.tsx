@@ -1,7 +1,8 @@
 import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, Search, X } from "lucide-react";
+import { Menu, Search, UserCircle2, X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -9,6 +10,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
+  const { profile, user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
@@ -93,6 +95,14 @@ const Navbar = () => {
             </button>
           )}
 
+          <Link
+            to={user ? "/profile" : "/auth"}
+            className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
+          >
+            <UserCircle2 size={18} />
+            {user ? profile?.display_name || "Perfil" : "Entrar"}
+          </Link>
+
           <button
             onClick={() => setMenuOpen((current) => !current)}
             className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/6 p-2.5 text-white/78 transition-colors hover:bg-white/10 hover:text-white md:hidden"
@@ -117,6 +127,9 @@ const Navbar = () => {
             </Link>
             <Link to="/channels" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
               Canais
+            </Link>
+            <Link to={user ? "/profile" : "/auth"} onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
+              {user ? "Perfil" : "Entrar"}
             </Link>
             <Link to="/legal/dmca" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
               DMCA, termos e cookies

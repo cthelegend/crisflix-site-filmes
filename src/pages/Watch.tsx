@@ -2,8 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Check, Info, Languages, Play, SkipForward, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 import { saveContinueWatching } from "@/lib/continueWatching";
 import { AudioTrack, getAvailablePlayerOptions, getPlayerDiagnostics } from "@/lib/playerProviders";
+import { saveRemoteContinueWatching } from "@/lib/userMedia";
 import { MovieDetails, Season, getMovieDetails, getTVDetails, getTVSeason } from "@/lib/tmdb";
 
 const NEAR_END_THRESHOLD = 0.92;
@@ -24,6 +26,7 @@ const Watch = () => {
   const navigate = useNavigate();
   const sessionStartRef = useRef(Date.now());
   const baseProgressRef = useRef(initialResumeSeconds);
+  const { user } = useAuth();
 
   const season = Number(searchParams.get("s") || 1);
   const episode = Number(searchParams.get("e") || 1);
@@ -89,7 +92,7 @@ const Watch = () => {
       if (!details || !numericId) return;
 
       const latestProgress = syncProgress();
-      saveContinueWatching({
+      const entry = {
         id: numericId,
         type: isMovie ? "movie" : "tv",
         title: details.title || details.name || "",
@@ -104,7 +107,13 @@ const Watch = () => {
         runtimeSeconds: runtimeSeconds || undefined,
         nextEpisode,
         updatedAt: Date.now(),
-      });
+      };
+
+      saveContinueWatching(entry);
+
+      if (user) {
+        void saveRemoteContinueWatching(user.id, entry);
+      }
     };
 
     const interval = window.setInterval(persist, SAVE_INTERVAL_MS);
@@ -128,7 +137,7 @@ const Watch = () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
       persist();
     };
-  }, [details, episode, isMovie, nextEpisode, numericId, progressSeconds, runtimeSeconds, season]);
+  }, [details, episode, isMovie, nextEpisode, numericId, progressSeconds, runtimeSeconds, season, user]);
 
   const showNextEpisode = !isMovie && nextEpisode && runtimeSeconds > 0 && progressSeconds / runtimeSeconds >= NEAR_END_THRESHOLD;
 
