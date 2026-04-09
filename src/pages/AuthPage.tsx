@@ -1,8 +1,6 @@
-import { FormEvent, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { FormEvent, useEffect, useState } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import Navbar from "@/components/Navbar";
-import SiteFooter from "@/components/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,7 +12,16 @@ const AuthPage = () => {
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { configured, signIn, signUp } = useAuth();
+  const { configured, loading, signIn, signUp, user } = useAuth();
+
+  useEffect(() => {
+    document.body.classList.add("overflow-hidden");
+    return () => document.body.classList.remove("overflow-hidden");
+  }, []);
+
+  if (!loading && user) {
+    return <Navigate to="/profile" replace />;
+  }
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
@@ -38,88 +45,95 @@ const AuthPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <div className="relative min-h-screen overflow-hidden bg-black">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(229,9,20,0.28),transparent_28%),linear-gradient(180deg,rgba(0,0,0,0.35),rgba(0,0,0,0.88))]" />
+      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center" }} />
 
-      <main className="px-4 pb-16 pt-24 md:px-12 md:pt-28">
-        <section className="mx-auto max-w-4xl rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-7 md:p-10">
-          <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr]">
-            <div>
-              <p className="text-[11px] uppercase tracking-[0.34em] text-primary/80 md:text-sm md:tracking-[0.35em]">
-                Conta
-              </p>
-              <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
-                Entre ou crie sua conta
-              </h1>
-              <p className="mt-5 text-sm leading-7 text-white/68 md:text-base">
-                Salve favoritos, organize sua lista, continue assistindo em qualquer dispositivo e personalize seu perfil.
-              </p>
+      <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
+        <section className="w-full max-w-md rounded-[2rem] border border-white/10 bg-black/72 p-5 backdrop-blur-2xl sm:p-7">
+          <p className="text-center text-3xl font-bold tracking-[0.16em] text-primary" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+            CRISFLIX
+          </p>
+          <h1 className="mt-6 text-center text-3xl font-bold text-white">
+            {mode === "login" ? "Entrar" : "Criar conta"}
+          </h1>
+          <p className="mt-3 text-center text-sm leading-6 text-white/58">
+            Salve favoritos, organize sua lista e continue assistindo com seu perfil.
+          </p>
 
-              {!configured && (
-                <div className="mt-6 rounded-[1.6rem] border border-amber-400/30 bg-amber-400/10 p-5 text-sm leading-7 text-amber-50">
-                  Preencha <code>VITE_SUPABASE_URL</code> e <code>VITE_SUPABASE_ANON_KEY</code> para ativar contas reais.
-                </div>
-              )}
+          {!configured && (
+            <div className="mt-6 rounded-[1.3rem] border border-amber-400/30 bg-amber-400/10 p-4 text-sm leading-6 text-amber-50">
+              Configure o Supabase para ativar contas reais.
             </div>
+          )}
 
-            <div className="rounded-[1.8rem] border border-white/10 bg-black/35 p-5">
-              <div className="mb-5 flex gap-2 rounded-full border border-white/10 bg-white/[0.04] p-1">
-                <button
-                  type="button"
-                  onClick={() => setMode("login")}
-                  className={`flex-1 rounded-full px-4 py-2 text-sm transition-colors ${
-                    mode === "login" ? "bg-white text-black" : "text-white/68 hover:text-white"
-                  }`}
-                >
-                  Login
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode("signup")}
-                  className={`flex-1 rounded-full px-4 py-2 text-sm transition-colors ${
-                    mode === "signup" ? "bg-white text-black" : "text-white/68 hover:text-white"
-                  }`}
-                >
-                  Cadastro
-                </button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {mode === "signup" && (
-                  <div>
-                    <label className="mb-2 block text-sm text-white/70">Nome de perfil</label>
-                    <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} required />
-                  </div>
-                )}
-
-                <div>
-                  <label className="mb-2 block text-sm text-white/70">E-mail</label>
-                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                </div>
-
-                <div>
-                  <label className="mb-2 block text-sm text-white/70">Senha</label>
-                  <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={submitting || !configured}
-                  className="mt-2 h-12 rounded-full border border-white bg-white px-7 text-sm font-semibold text-black transition-colors duration-200 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {submitting ? "Carregando..." : mode === "login" ? "Entrar" : "Criar conta"}
-                </Button>
-              </form>
-
-              <p className="mt-5 text-sm text-white/54">
-                Ao continuar, você poderá sincronizar favoritos, minha lista e o progresso real de reprodução.
-              </p>
-            </div>
+          <div className="mt-6 flex gap-2 rounded-full border border-white/10 bg-white/[0.04] p-1">
+            <button
+              type="button"
+              onClick={() => setMode("login")}
+              className={`flex-1 rounded-full px-4 py-2.5 text-sm transition-colors ${
+                mode === "login" ? "bg-white text-black" : "text-white/68 hover:text-white"
+              }`}
+            >
+              Login
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("signup")}
+              className={`flex-1 rounded-full px-4 py-2.5 text-sm transition-colors ${
+                mode === "signup" ? "bg-white text-black" : "text-white/68 hover:text-white"
+              }`}
+            >
+              Cadastro
+            </button>
           </div>
+
+          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+            {mode === "signup" && (
+              <div>
+                <label className="mb-2 block text-sm text-white/70">Nome do perfil</label>
+                <Input
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  required
+                  className="h-12 rounded-2xl border-white/10 bg-white/[0.04] text-white"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="mb-2 block text-sm text-white/70">E-mail</label>
+              <Input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="h-12 rounded-2xl border-white/10 bg-white/[0.04] text-white"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm text-white/70">Senha</label>
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="h-12 rounded-2xl border-white/10 bg-white/[0.04] text-white"
+              />
+            </div>
+
+            <Button
+              type="submit"
+              disabled={submitting || !configured}
+              className="mt-2 h-12 w-full rounded-full border border-white bg-white px-7 text-sm font-semibold text-black transition-colors duration-200 hover:bg-black hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {submitting ? "Carregando..." : mode === "login" ? "Entrar" : "Criar conta"}
+            </Button>
+          </form>
         </section>
       </main>
-
-      <SiteFooter />
     </div>
   );
 };

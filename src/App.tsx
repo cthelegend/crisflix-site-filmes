@@ -16,6 +16,7 @@ import ChannelWatch from "./pages/ChannelWatch";
 import Donate from "./pages/Donate";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import MyListPage from "./pages/MyListPage";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/donate" element={<Donate />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/my-list" element={<MyListPage />} />
             <Route path="/legal/dmca" element={<DmcaTerms />} />
             <Route path="*" element={<NotFound />} />
           </Routes>

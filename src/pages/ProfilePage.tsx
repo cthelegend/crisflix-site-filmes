@@ -1,168 +1,167 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
-import { Navigate, Link } from "react-router-dom";
-import { Bookmark, Heart, PlayCircle, UserCircle2 } from "lucide-react";
+import { Navigate, useNavigate } from "react-router-dom";
+import { Pencil, Plus, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import Navbar from "@/components/Navbar";
-import SiteFooter from "@/components/SiteFooter";
-import ContinueWatchingCard from "@/components/ContinueWatchingCard";
-import MovieCard from "@/components/MovieCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchFavorites, fetchRemoteContinueWatching, fetchWatchlist, UserMediaState } from "@/lib/userMedia";
-import { Movie } from "@/lib/tmdb";
-
-function toMovieItem(item: UserMediaState): Movie {
-  return {
-    id: item.media_id,
-    title: item.media_type === "movie" ? item.title : undefined,
-    name: item.media_type === "tv" ? item.title : undefined,
-    poster_path: item.poster_path,
-    backdrop_path: item.backdrop_path,
-    overview: "",
-    vote_average: item.vote_average,
-    release_date: item.release_date || undefined,
-    first_air_date: item.first_air_date || undefined,
-    genre_ids: [],
-    media_type: item.media_type,
-  };
-}
 
 const ProfilePage = () => {
-  const { user, profile, loading, configured, signOut, updateDisplayName } = useAuth();
+  const { activeProfile, loading, profile, selectProfile, updateProfile, user } = useAuth();
+  const navigate = useNavigate();
+  const [manageMode, setManageMode] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
-  const [favorites, setFavorites] = useState<UserMediaState[]>([]);
-  const [watchlist, setWatchlist] = useState<UserMediaState[]>([]);
-  const [continueWatching, setContinueWatching] = useState<any[]>([]);
+  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
 
   useEffect(() => {
     setDisplayName(profile?.display_name || "");
-  }, [profile?.display_name]);
+    setAvatarUrl(profile?.avatar_url || "");
+  }, [profile?.avatar_url, profile?.display_name]);
 
-  useEffect(() => {
-    if (!user || !configured) return;
-
-    Promise.all([
-      fetchFavorites(user.id).then(setFavorites),
-      fetchWatchlist(user.id).then(setWatchlist),
-      fetchRemoteContinueWatching(user.id).then(setContinueWatching),
-    ]).catch((error) => {
-      toast.error(error instanceof Error ? error.message : "Não foi possível carregar o perfil.");
-    });
-  }, [configured, user]);
-
-  const favoriteItems = useMemo(() => favorites.map(toMovieItem), [favorites]);
-  const watchlistItems = useMemo(() => watchlist.map(toMovieItem), [watchlist]);
+  const initials = useMemo(
+    () =>
+      (profile?.display_name || "Perfil")
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((part) => part[0]?.toUpperCase() || "")
+        .join(""),
+    [profile?.display_name],
+  );
 
   if (!loading && !user) {
     return <Navigate to="/auth" replace />;
   }
 
-  const handleProfileSave = async (event: FormEvent) => {
+  const handleProfileClick = () => {
+    if (!profile) return;
+    if (manageMode) {
+      setEditing(true);
+      return;
+    }
+
+    selectProfile(profile);
+    navigate("/");
+  };
+
+  const handleSave = async (event: FormEvent) => {
     event.preventDefault();
     try {
-      await updateDisplayName(displayName.trim());
+      await updateProfile({
+        displayName: displayName.trim(),
+        avatarUrl: avatarUrl.trim() || null,
+      });
+      setEditing(false);
       toast.success("Perfil atualizado.");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível salvar o perfil.");
+      toast.error(error instanceof Error ? error.message : "Não foi possível atualizar o perfil.");
     }
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <div className="relative min-h-screen overflow-hidden bg-black">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(229,9,20,0.22),transparent_24%),linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.92))]" />
 
-      <main className="px-4 pb-16 pt-24 md:px-12 md:pt-28">
-        <section className="mx-auto max-w-7xl space-y-8">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-7 md:p-10">
-            <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
-              <div>
-                <p className="text-[11px] uppercase tracking-[0.34em] text-primary/80 md:text-sm md:tracking-[0.35em]">
-                  Perfil
-                </p>
-                <div className="mt-4 flex items-center gap-4">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/10 text-white">
-                    <UserCircle2 size={34} />
-                  </div>
-                  <div>
-                    <h1 className="text-3xl font-bold text-white">{profile?.display_name || "Minha conta"}</h1>
-                    <p className="mt-1 text-sm text-white/58">{user?.email}</p>
-                  </div>
+      <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
+        <section className="w-full max-w-5xl">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-3xl font-bold tracking-[0.16em] text-primary" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+              CRISFLIX
+            </p>
+            <h1 className="mt-8 text-3xl font-bold text-white sm:text-4xl md:text-5xl">Quem está assistindo?</h1>
+            <p className="mt-3 text-sm leading-6 text-white/54 md:text-base">
+              Escolha seu perfil para continuar.
+            </p>
+          </div>
+
+          <div className="mt-10 flex flex-col items-center">
+            <button
+              onClick={handleProfileClick}
+              className="group relative flex flex-col items-center"
+            >
+              <div className="relative">
+                <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/10 text-white shadow-[0_18px_50px_rgba(0,0,0,0.24)] transition-all group-hover:border-white/30 group-hover:bg-white/14 sm:h-36 sm:w-36">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt={profile.display_name || "Perfil"} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <UserCircle2 size={42} className="opacity-90 sm:size-[54px]" />
+                      <span className="mt-2 text-lg font-semibold sm:text-xl">{initials}</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center justify-center rounded-full border border-white/12 bg-black px-3 py-2 text-white shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
+                  <Pencil size={16} />
                 </div>
               </div>
 
-              <form onSubmit={handleProfileSave} className="rounded-[1.8rem] border border-white/10 bg-black/35 p-5">
-                <label className="mb-2 block text-sm text-white/70">Nome de perfil</label>
-                <Input value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
-                <div className="mt-4 flex flex-wrap gap-3">
+              <span className="mt-7 text-base text-white/80 transition-colors group-hover:text-white sm:text-lg">
+                {profile?.display_name || "Meu perfil"}
+              </span>
+            </button>
+
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Button
+                type="button"
+                onClick={() => setManageMode((current) => !current)}
+                className="h-11 rounded-full border border-white bg-transparent px-6 text-white hover:bg-white hover:text-black"
+              >
+                {manageMode ? "Concluir" : "Gerenciar perfil"}
+              </Button>
+              {activeProfile && (
+                <Button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="h-11 rounded-full border border-white bg-white px-6 text-black hover:bg-black hover:text-white"
+                >
+                  Entrar no feed
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {editing && (
+            <div className="mx-auto mt-10 max-w-xl rounded-[2rem] border border-white/10 bg-black/60 p-5 backdrop-blur-2xl sm:p-6">
+              <div className="mb-5 flex items-center gap-2 text-white">
+                <Pencil size={18} />
+                <h2 className="text-xl font-semibold">Editar perfil</h2>
+              </div>
+
+              <form onSubmit={handleSave} className="space-y-4">
+                <div>
+                  <label className="mb-2 block text-sm text-white/70">Nome</label>
+                  <Input
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="h-12 rounded-2xl border-white/10 bg-white/[0.04] text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm text-white/70">Foto do perfil (URL)</label>
+                  <Input
+                    value={avatarUrl}
+                    onChange={(e) => setAvatarUrl(e.target.value)}
+                    placeholder="https://..."
+                    className="h-12 rounded-2xl border-white/10 bg-white/[0.04] text-white"
+                  />
+                </div>
+
+                <div className="flex flex-wrap gap-3 pt-2">
                   <Button type="submit" className="h-11 rounded-full border border-white bg-white px-6 text-black hover:bg-black hover:text-white">
-                    Salvar perfil
+                    Salvar
                   </Button>
-                  <Button type="button" onClick={() => signOut()} variant="secondary" className="h-11 rounded-full border border-white bg-black px-6 text-white hover:bg-white hover:text-black">
-                    Sair
+                  <Button type="button" onClick={() => setEditing(false)} className="h-11 rounded-full border border-white bg-transparent px-6 text-white hover:bg-white hover:text-black">
+                    Cancelar
                   </Button>
                 </div>
               </form>
             </div>
-          </div>
-
-          <section>
-            <div className="mb-4 flex items-center gap-2">
-              <PlayCircle size={18} className="text-primary" />
-              <h2 className="text-2xl font-semibold text-white">Continuar assistindo</h2>
-            </div>
-            {continueWatching.length ? (
-              <div className="flex gap-3 overflow-x-auto pb-4">
-                {continueWatching.map((item) => (
-                  <ContinueWatchingCard key={`${item.type}-${item.id}`} item={item} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-white/54">Nenhum progresso salvo ainda.</p>
-            )}
-          </section>
-
-          <section>
-            <div className="mb-4 flex items-center gap-2">
-              <Heart size={18} className="text-primary" />
-              <h2 className="text-2xl font-semibold text-white">Favoritos</h2>
-            </div>
-            {favoriteItems.length ? (
-              <div className="flex gap-3 overflow-x-auto pb-4">
-                {favoriteItems.map((item) => (
-                  <MovieCard key={`${item.media_type}-${item.id}`} item={item} type={item.media_type as "movie" | "tv"} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-white/54">Você ainda não favoritou nenhum título.</p>
-            )}
-          </section>
-
-          <section>
-            <div className="mb-4 flex items-center gap-2">
-              <Bookmark size={18} className="text-primary" />
-              <h2 className="text-2xl font-semibold text-white">Minha lista</h2>
-            </div>
-            {watchlistItems.length ? (
-              <div className="flex gap-3 overflow-x-auto pb-4">
-                {watchlistItems.map((item) => (
-                  <MovieCard key={`${item.media_type}-${item.id}`} item={item} type={item.media_type as "movie" | "tv"} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-white/54">Sua lista ainda está vazia.</p>
-            )}
-          </section>
-
-          {!configured && (
-            <div className="rounded-[1.6rem] border border-amber-400/30 bg-amber-400/10 p-5 text-sm leading-7 text-amber-50">
-              O Supabase ainda não está configurado. Preencha as variáveis no ambiente e execute o schema SQL para ativar contas reais.
-            </div>
           )}
         </section>
       </main>
-
-      <SiteFooter />
     </div>
   );
 };

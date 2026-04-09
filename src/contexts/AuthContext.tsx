@@ -4,7 +4,9 @@ import { getContinueWatching } from "@/lib/continueWatching";
 import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 import { saveRemoteContinueWatching } from "@/lib/userMedia";
 
-interface UserProfile {
+const ACTIVE_PROFILE_KEY = "crisflix-active-profile";
+
+export interface UserProfile {
   id: string;
   display_name: string | null;
   avatar_url: string | null;
@@ -14,13 +16,16 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   profile: UserProfile | null;
+  activeProfile: UserProfile | null;
   loading: boolean;
   configured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, displayName: string) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
-  updateDisplayName: (displayName: string) => Promise<void>;
+  selectProfile: (profile: UserProfile) => void;
+  clearActiveProfile: () => void;
+  updateProfile: (payload: { displayName: string; avatarUrl: string | null }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -36,16 +41,35 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [activeProfile, setActiveProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const selectProfile = (nextProfile: UserProfile) => {
+    setActiveProfile(nextProfile);
+    localStorage.setItem(ACTIVE_PROFILE_KEY, nextProfile.id);
+  };
+
+  const clearActiveProfile = () => {
+    setActiveProfile(null);
+    localStorage.removeItem(ACTIVE_PROFILE_KEY);
+  };
 
   const refreshProfile = async () => {
     if (!user || !supabase) {
       setProfile(null);
+      setActiveProfile(null);
       return;
     }
 
     const nextProfile = await fetchProfile(user.id);
     setProfile(nextProfile);
+
+    if (nextProfile) {
+      const storedId = localStorage.getItem(ACTIVE_PROFILE_KEY);
+      if (storedId === nextProfile.id || !storedId) {
+        setActiveProfile(nextProfile);
+      }
+    }
   };
 
   useEffect(() => {
@@ -60,7 +84,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentSession?.user ?? null);
 
       if (currentSession?.user) {
-        setProfile(await fetchProfile(currentSession.user.id));
+        const nextProfile = await fetchProfile(currentSession.user.id);
+        setProfile(nextProfile);
+        if (nextProfile) {
+          const storedId = localStorage.getItem(ACTIVE_PROFILE_KEY);
+          if (storedId === nextProfile.id || !storedId) {
+            setActiveProfile(nextProfile);
+          }
+        }
       }
 
       setLoading(false);
@@ -74,12 +105,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       queueMicrotask(async () => {
         if (nextSession?.user) {
-          setProfile(await fetchProfile(nextSession.user.id));
+          const nextProfile = await fetchProfile(nextSession.user.id);
+          setProfile(nextProfile);
+
+          if (nextProfile) {
+            const storedId = localStorage.getItem(ACTIVE_PROFILE_KEY);
+            if (storedId === nextProfile.id || !storedId) {
+              setActiveProfile(nextProfile);
+            }
+          }
 
           const localProgress = getContinueWatching();
           await Promise.allSettled(localProgress.map((entry) => saveRemoteContinueWatching(nextSession.user.id, entry)));
         } else {
           setProfile(null);
+          setActiveProfile(null);
+          localStorage.removeItem(ACTIVE_PROFILE_KEY);
         }
       });
     });
@@ -92,6 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       user,
       session,
       profile,
+      activeProfile,
       loading,
       configured: isSupabaseConfigured,
       signIn: async (email, password) => {
@@ -122,18 +164,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (error) throw error;
       },
       refreshProfile,
-      updateDisplayName: async (displayName: string) => {
+      selectProfile,
+      clearActiveProfile,
+      updateProfile: async ({ displayName, avatarUrl }) => {
         if (!supabase || !user) throw new Error("Sessão indisponível.");
         const { error } = await supabase.from("profiles").upsert({
           id: user.id,
           display_name: displayName,
-          avatar_url: profile?.avatar_url || null,
+          avatar_url: avatarUrl,
         });
         if (error) throw error;
-        await refreshProfile();
+        const nextProfile = await fetchProfile(user.id);
+        setProfile(nextProfile);
+        if (nextProfile) {
+          setActiveProfile(nextProfile);
+          localStorage.setItem(ACTIVE_PROFILE_KEY, nextProfile.id);
+        }
       },
     }),
-    [loading, profile, session, user],
+    [activeProfile, loading, profile, session, user],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
