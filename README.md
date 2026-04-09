@@ -29,21 +29,6 @@ Plataforma de streaming inspirada na Netflix, desenvolvida para exibição de fi
 
 ---
 
-## 📁 Estrutura do projeto
-
-```
-📦 crisflix
-├── public
-├── src
-├── dist
-├── .env
-├── index.html
-├── package.json
-└── README.md
-```
-
----
-
 ## ⚙️ Como rodar localmente
 
 ```bash
@@ -52,22 +37,6 @@ cd crisflix-site-filmes
 npm install
 npm run dev
 ```
-
-Acesse: [http://localhost:5173](http://localhost:5173)
-
----
-
-## 📦 Build
-
-```bash
-npm run build
-```
-
----
-
-## 🌍 Deploy
-
-Hospedado na **Vercel** para máxima performance.
 
 ---
 
