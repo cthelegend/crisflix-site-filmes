@@ -74,7 +74,7 @@ Hospedado na **Vercel** para máxima performance.
 ## 📌 Roadmap
 
 * 🔐 ~~Autenticação~~
-* ❤️ Favoritos
+* ❤️ ~~Favoritos~~
 * ➕ Novos canais
 ---
 
