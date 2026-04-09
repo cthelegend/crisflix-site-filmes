@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, BookmarkPlus, Calendar, Check, Clock3, ExternalLink, Heart, Play, SkipForward, Users2 } from "lucide-react";
+import { ArrowLeft, BookmarkPlus, Calendar, Check, Clock3, ExternalLink, Play, SkipForward, Users2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
@@ -18,7 +18,7 @@ import {
   getTVDetails,
   getTVSeason,
 } from "@/lib/tmdb";
-import { fetchUserMediaState, toggleFavorite, toggleWatchlist, UserMediaState } from "@/lib/userMedia";
+import { fetchUserMediaState, toggleWatchlist, UserMediaState } from "@/lib/userMedia";
 
 const formatDate = (date?: string) =>
   date
@@ -174,22 +174,6 @@ const Details = () => {
       }
     : null;
 
-  const handleToggleFavorite = async () => {
-    if (!user || !mediaIdentity) {
-      navigate("/auth");
-      return;
-    }
-
-    try {
-      const nextValue = !savedState?.is_favorite;
-      const next = await toggleFavorite(user.id, mediaIdentity, nextValue);
-      setSavedState(next);
-      toast.success(nextValue ? "Adicionado aos favoritos." : "Removido dos favoritos.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível atualizar seus favoritos.");
-    }
-  };
-
   const handleToggleWatchlist = async () => {
     if (!user || !mediaIdentity) {
       navigate("/auth");
@@ -302,15 +286,6 @@ const Details = () => {
                     Ver no IMDb <ExternalLink size={16} />
                   </a>
                 )}
-
-                <Button
-                  onClick={handleToggleFavorite}
-                  variant="secondary"
-                  className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
-                >
-                  <Heart size={18} className={savedState?.is_favorite ? "fill-current" : ""} />
-                  {savedState?.is_favorite ? "Favoritado" : "Favoritar"}
-                </Button>
 
                 <Button
                   onClick={handleToggleWatchlist}

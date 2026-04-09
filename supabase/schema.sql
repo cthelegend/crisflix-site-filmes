@@ -21,7 +21,6 @@ create table if not exists public.user_media_state (
   progress_seconds integer,
   runtime_seconds integer,
   next_episode jsonb,
-  is_favorite boolean not null default false,
   in_watchlist boolean not null default false,
   updated_at timestamptz not null default now(),
   created_at timestamptz not null default now(),

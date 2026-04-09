@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Pencil, Plus, UserCircle2 } from "lucide-react";
+import { UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -80,24 +80,18 @@ const ProfilePage = () => {
               onClick={handleProfileClick}
               className="group relative flex flex-col items-center"
             >
-              <div className="relative">
-                <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/10 text-white shadow-[0_18px_50px_rgba(0,0,0,0.24)] transition-all group-hover:border-white/30 group-hover:bg-white/14 sm:h-36 sm:w-36">
-                  {profile?.avatar_url ? (
-                    <img src={profile.avatar_url} alt={profile.display_name || "Perfil"} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <UserCircle2 size={42} className="opacity-90 sm:size-[54px]" />
-                      <span className="mt-2 text-lg font-semibold sm:text-xl">{initials}</span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="absolute -bottom-3 left-1/2 flex -translate-x-1/2 items-center justify-center rounded-full border border-white/12 bg-black px-3 py-2 text-white shadow-[0_10px_24px_rgba(0,0,0,0.28)]">
-                  <Pencil size={16} />
-                </div>
+              <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/10 text-white shadow-[0_18px_50px_rgba(0,0,0,0.24)] transition-all group-hover:border-white/30 group-hover:bg-white/14 sm:h-36 sm:w-36">
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt={profile.display_name || "Perfil"} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex flex-col items-center">
+                    <UserCircle2 size={42} className="opacity-90 sm:size-[54px]" />
+                    <span className="mt-2 text-lg font-semibold sm:text-xl">{initials}</span>
+                  </div>
+                )}
               </div>
 
-              <span className="mt-7 text-base text-white/80 transition-colors group-hover:text-white sm:text-lg">
+              <span className="mt-4 text-base text-white/80 transition-colors group-hover:text-white sm:text-lg">
                 {profile?.display_name || "Meu perfil"}
               </span>
             </button>
@@ -110,15 +104,6 @@ const ProfilePage = () => {
               >
                 {manageMode ? "Concluir" : "Gerenciar perfil"}
               </Button>
-              {activeProfile && (
-                <Button
-                  type="button"
-                  onClick={() => navigate("/")}
-                  className="h-11 rounded-full border border-white bg-white px-6 text-black hover:bg-black hover:text-white"
-                >
-                  Entrar no feed
-                </Button>
-              )}
             </div>
           </div>
 

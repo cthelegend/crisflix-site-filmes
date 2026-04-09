@@ -61,9 +61,6 @@ const Navbar = () => {
             <Link to="/channels" className="transition-colors hover:text-white">
               Canais
             </Link>
-            <Link to="/my-list" className="transition-colors hover:text-white">
-              Minha Lista
-            </Link>
           </div>
         </div>
 
@@ -93,10 +90,10 @@ const Navbar = () => {
           {user && (
             <Link
               to="/my-list"
-              className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
+              className="hidden items-center justify-center rounded-full border border-white/10 bg-white/6 p-2.5 text-white/78 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
+              aria-label="Minha lista"
             >
               <Bookmark size={16} />
-              Minha Lista
             </Link>
           )}
 
@@ -104,8 +101,22 @@ const Navbar = () => {
             to={user ? "/profile" : "/auth"}
             className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
           >
-            <UserCircle2 size={18} />
-            {user ? activeProfile?.display_name || "Perfis" : "Entrar"}
+            {user ? (
+              activeProfile?.avatar_url ? (
+                <img
+                  src={activeProfile.avatar_url}
+                  alt="Meu Perfil"
+                  className="h-5 w-5 rounded-full object-cover ring-1 ring-white/12"
+                />
+              ) : (
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/12">
+                  <UserCircle2 size={14} />
+                </div>
+              )
+            ) : (
+              <UserCircle2 size={18} />
+            )}
+            {user ? "Meu Perfil" : "Entrar"}
           </Link>
 
           <button
@@ -137,7 +148,7 @@ const Navbar = () => {
               Minha Lista
             </Link>
             <Link to={user ? "/profile" : "/auth"} onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              {user ? "Perfis" : "Entrar"}
+              {user ? "Meu Perfil" : "Entrar"}
             </Link>
             <Link to="/donate" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
               Doar

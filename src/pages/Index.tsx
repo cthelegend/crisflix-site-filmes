@@ -6,7 +6,7 @@ import MovieRow from "@/components/MovieRow";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchFavorites, fetchWatchlist, UserMediaState } from "@/lib/userMedia";
+import { fetchWatchlist, UserMediaState } from "@/lib/userMedia";
 import {
   Movie,
   getNowPlayingMovies,
@@ -34,19 +34,14 @@ function toMovieItem(item: UserMediaState): Movie {
 
 const Index = () => {
   const { activeProfile, configured, loading, user } = useAuth();
-  const [favorites, setFavorites] = useState<UserMediaState[]>([]);
   const [watchlist, setWatchlist] = useState<UserMediaState[]>([]);
 
   useEffect(() => {
     if (!user || !configured) return;
 
-    Promise.all([fetchFavorites(user.id), fetchWatchlist(user.id)]).then(([nextFavorites, nextWatchlist]) => {
-      setFavorites(nextFavorites);
-      setWatchlist(nextWatchlist);
-    });
+    fetchWatchlist(user.id).then(setWatchlist);
   }, [configured, user]);
 
-  const favoriteItems = useMemo(() => favorites.map(toMovieItem), [favorites]);
   const watchlistItems = useMemo(() => watchlist.map(toMovieItem), [watchlist]);
 
   if (!loading && user && !activeProfile) {
@@ -60,10 +55,9 @@ const Index = () => {
 
       <main className="-mt-20 relative z-10 pb-16 md:-mt-24">
         <ContinueWatchingRow />
-        <MovieRow title="Top 10" fetchFn={getTopRatedMovies} type="movie" />
+        <MovieRow title="Melhores Avaliações" fetchFn={getTopRatedMovies} type="movie" />
         <MovieRow title="Em Alta" fetchFn={getTrending} />
         {watchlistItems.length > 0 && <MovieRow title="Minha Lista" items={watchlistItems} />}
-        {favoriteItems.length > 0 && <MovieRow title="Favoritos" items={favoriteItems} />}
         <MovieRow title="Filmes Populares" fetchFn={getPopularMovies} type="movie" />
         <MovieRow title="Séries Populares" fetchFn={getPopularTV} type="tv" />
         <MovieRow title="Em Cartaz" fetchFn={getNowPlayingMovies} type="movie" />

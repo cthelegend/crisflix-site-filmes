@@ -18,7 +18,6 @@ export interface UserMediaState {
   progress_seconds?: number | null;
   runtime_seconds?: number | null;
   next_episode?: { season: number; episode: number } | null;
-  is_favorite: boolean;
   in_watchlist: boolean;
   updated_at?: string;
 }
@@ -104,10 +103,6 @@ export async function upsertUserMediaState(
   return data;
 }
 
-export async function toggleFavorite(userId: string, media: MediaIdentity, nextValue: boolean) {
-  return upsertUserMediaState(userId, media, { is_favorite: nextValue });
-}
-
 export async function toggleWatchlist(userId: string, media: MediaIdentity, nextValue: boolean) {
   return upsertUserMediaState(userId, media, { in_watchlist: nextValue });
 }
@@ -148,21 +143,6 @@ export async function fetchRemoteContinueWatching(userId: string) {
 
   if (error) throw error;
   return (data || []).map(mapRowToContinueWatching);
-}
-
-export async function fetchFavorites(userId: string) {
-  if (!supabase) return [];
-
-  const { data, error } = await supabase
-    .from("user_media_state")
-    .select("*")
-    .eq("user_id", userId)
-    .eq("is_favorite", true)
-    .order("updated_at", { ascending: false })
-    .returns<UserMediaState[]>();
-
-  if (error) throw error;
-  return data || [];
 }
 
 export async function fetchWatchlist(userId: string) {

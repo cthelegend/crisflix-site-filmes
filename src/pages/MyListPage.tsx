@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
-import { Bookmark, Heart } from "lucide-react";
+import { Bookmark } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import MovieCard from "@/components/MovieCard";
 import { useAuth } from "@/contexts/AuthContext";
-import { fetchFavorites, fetchWatchlist, UserMediaState } from "@/lib/userMedia";
+import { fetchWatchlist, UserMediaState } from "@/lib/userMedia";
 import { Movie } from "@/lib/tmdb";
 
 function toMovieItem(item: UserMediaState): Movie {
@@ -45,19 +45,14 @@ const GridSection = ({ title, icon, items, emptyText }: { title: string; icon: R
 
 const MyListPage = () => {
   const { configured, loading, user } = useAuth();
-  const [favorites, setFavorites] = useState<UserMediaState[]>([]);
   const [watchlist, setWatchlist] = useState<UserMediaState[]>([]);
 
   useEffect(() => {
     if (!user || !configured) return;
 
-    Promise.all([fetchFavorites(user.id), fetchWatchlist(user.id)]).then(([nextFavorites, nextWatchlist]) => {
-      setFavorites(nextFavorites);
-      setWatchlist(nextWatchlist);
-    });
+    fetchWatchlist(user.id).then(setWatchlist);
   }, [configured, user]);
 
-  const favoriteItems = useMemo(() => favorites.map(toMovieItem), [favorites]);
   const watchlistItems = useMemo(() => watchlist.map(toMovieItem), [watchlist]);
 
   if (!loading && !user) {
@@ -83,13 +78,6 @@ const MyListPage = () => {
             icon={<Bookmark size={18} className="text-primary" />}
             items={watchlistItems}
             emptyText="Você ainda não adicionou títulos à sua lista."
-          />
-
-          <GridSection
-            title="Favoritos"
-            icon={<Heart size={18} className="text-primary" />}
-            items={favoriteItems}
-            emptyText="Você ainda não marcou nenhum favorito."
           />
         </section>
       </main>
