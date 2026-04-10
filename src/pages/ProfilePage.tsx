@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Camera, ImageIcon, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 
-function createAvatarPreset(from: string, to: string, accent: string, label: string) {
+function createAvatarPreset(from: string, to: string, accent: string) {
   const svg = `
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
       <defs>
@@ -21,7 +21,6 @@ function createAvatarPreset(from: string, to: string, accent: string, label: str
       <circle cx="125" cy="119" r="10" fill="${accent}"/>
       <circle cx="195" cy="119" r="10" fill="${accent}"/>
       <path d="M129 153c18 14 44 14 62 0" fill="none" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>
-      <text x="160" y="302" fill="#fff" font-size="28" font-family="Arial, sans-serif" font-weight="700" text-anchor="middle">${label}</text>
     </svg>
   `;
 
@@ -29,12 +28,12 @@ function createAvatarPreset(from: string, to: string, accent: string, label: str
 }
 
 const AVATAR_PRESETS = [
-  createAvatarPreset("#e50914", "#671016", "#111111", "C1"),
-  createAvatarPreset("#0f766e", "#042f2e", "#111827", "C2"),
-  createAvatarPreset("#2563eb", "#111827", "#1e3a8a", "C3"),
-  createAvatarPreset("#f59e0b", "#7c2d12", "#431407", "C4"),
-  createAvatarPreset("#9333ea", "#111827", "#581c87", "C5"),
-  createAvatarPreset("#16a34a", "#052e16", "#14532d", "C6"),
+  createAvatarPreset("#e50914", "#671016", "#111111"),
+  createAvatarPreset("#0f766e", "#042f2e", "#111827"),
+  createAvatarPreset("#2563eb", "#111827", "#1e3a8a"),
+  createAvatarPreset("#f59e0b", "#7c2d12", "#431407"),
+  createAvatarPreset("#9333ea", "#111827", "#581c87"),
+  createAvatarPreset("#16a34a", "#052e16", "#14532d"),
 ];
 
 const ProfilePage = () => {
@@ -50,17 +49,6 @@ const ProfilePage = () => {
     setDisplayName(profile?.display_name || "");
     setAvatarUrl(profile?.avatar_url || "");
   }, [profile?.avatar_url, profile?.display_name]);
-
-  const initials = useMemo(
-    () =>
-      (profile?.display_name || "Perfil")
-        .split(" ")
-        .filter(Boolean)
-        .slice(0, 2)
-        .map((part) => part[0]?.toUpperCase() || "")
-        .join(""),
-    [profile?.display_name],
-  );
 
   if (!loading && !user) {
     return <Navigate to="/auth" replace />;
@@ -133,10 +121,7 @@ const ProfilePage = () => {
                 {profile?.avatar_url ? (
                   <img src={profile.avatar_url} alt={profile.display_name || "Perfil"} className="h-full w-full object-cover" />
                 ) : (
-                  <div className="flex flex-col items-center">
-                    <UserCircle2 size={42} className="opacity-90 sm:size-[54px]" />
-                    <span className="mt-2 text-lg font-semibold sm:text-xl">{initials}</span>
-                  </div>
+                  <UserCircle2 size={54} className="opacity-90" />
                 )}
               </div>
 

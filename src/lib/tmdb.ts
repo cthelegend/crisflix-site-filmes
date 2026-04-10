@@ -16,6 +16,8 @@ export const getBackdropUrl = (path: string | null) =>
 export const formatDisplayedRating = (voteAverage?: number) =>
   voteAverage && voteAverage > 0 ? voteAverage.toFixed(1) : "N/D";
 
+const getTodayDate = () => new Date().toISOString().slice(0, 10);
+
 async function fetchTMDB<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
   const url = new URL(`${BASE_URL}${endpoint}`);
   url.searchParams.set("language", "pt-BR");
@@ -136,7 +138,13 @@ export const getTrending = (page = 1) => fetchTMDB<TMDBResponse>("/trending/all/
 export const getPopularMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/popular", { page: String(page) });
 export const getTopRatedMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/top_rated", { page: String(page) });
 export const getNowPlayingMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/now_playing", { page: String(page) });
-export const getUpcomingMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/upcoming", { page: String(page) });
+export const getUpcomingMovies = (page = 1) =>
+  fetchTMDB<TMDBResponse>("/discover/movie", {
+    include_adult: "false",
+    page: String(page),
+    "primary_release_date.gte": getTodayDate(),
+    sort_by: "primary_release_date.asc",
+  });
 
 export const getPopularTV = (page = 1) => fetchTMDB<TMDBResponse>("/tv/popular", { page: String(page) });
 export const getTopRatedTV = (page = 1) => fetchTMDB<TMDBResponse>("/tv/top_rated", { page: String(page) });
@@ -161,6 +169,37 @@ export const getMoviesByGenre = (genreId: number, page = 1) =>
 
 export const getTVByGenre = (genreId: number, page = 1) =>
   fetchTMDB<TMDBResponse>("/discover/tv", { with_genres: String(genreId), page: String(page) });
+
+export function hasPrimaryGenre(item: Pick<Movie, "genre_ids">, genreId: number) {
+  return item.genre_ids?.[0] === genreId;
+}
+
+async function getPrimaryGenreCollection(
+  genreId: number,
+  fetchPage: (genreId: number, page: number) => Promise<TMDBResponse>,
+  pages = [1, 2, 3, 4, 5],
+) {
+  const results = await Promise.allSettled(pages.map((page) => fetchPage(genreId, page)));
+  const seen = new Set<number>();
+  const varietySeed = Math.floor(Date.now() / 1000 / 60 / 30);
+
+  return {
+    page: 1,
+    total_pages: 1,
+    results: results
+      .flatMap((result) => (result.status === "fulfilled" ? result.value.results : []))
+      .sort((a, b) => ((a.id * 9301 + varietySeed * 233) % 233280) - ((b.id * 9301 + varietySeed * 233) % 233280))
+      .filter((item) => {
+        if (!hasPrimaryGenre(item, genreId) || seen.has(item.id)) return false;
+        seen.add(item.id);
+        return true;
+      }),
+  };
+}
+
+export const getMoviesByPrimaryGenre = (genreId: number) => getPrimaryGenreCollection(genreId, getMoviesByGenre);
+
+export const getTVByPrimaryGenre = (genreId: number) => getPrimaryGenreCollection(genreId, getTVByGenre);
 
 export const MOVIE_GENRES: { id: number; name: string }[] = [
   { id: 28, name: "Ação" },

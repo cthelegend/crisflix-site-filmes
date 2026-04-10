@@ -195,7 +195,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             avatar_url: null,
           });
           if (profileError) throw profileError;
-          await supabase.auth.signOut();
         }
       },
       signOut: async () => {

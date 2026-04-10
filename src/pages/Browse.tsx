@@ -7,12 +7,12 @@ import {
   MOVIE_GENRES,
   Movie,
   TV_GENRES,
-  getMoviesByGenre,
+  getMoviesByPrimaryGenre,
   getPopularMovies,
   getPopularTV,
   getTopRatedMovies,
   getTopRatedTV,
-  getTVByGenre,
+  getTVByPrimaryGenre,
 } from "@/lib/tmdb";
 
 const Browse = () => {
@@ -40,7 +40,9 @@ const Browse = () => {
       setLoading(true);
       try {
         if (selectedGenre) {
-          const data = isMovies ? await getMoviesByGenre(Number(selectedGenre)) : await getTVByGenre(Number(selectedGenre));
+          const data = isMovies
+            ? await getMoviesByPrimaryGenre(Number(selectedGenre))
+            : await getTVByPrimaryGenre(Number(selectedGenre));
           setItems(data.results);
           return;
         }

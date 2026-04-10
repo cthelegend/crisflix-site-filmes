@@ -78,12 +78,7 @@ const AuthPage = () => {
         toast.success("Login realizado com sucesso.");
       } else {
         await signUp(email, password, displayName.trim());
-        toast.success("Conta criada. Entre com seu e-mail e senha.");
-        setMode("login");
-        setDisplayName("");
-        setPassword("");
-        window.setTimeout(() => passwordInputRef.current?.focus(), 0);
-        return;
+        toast.success("Conta criada com sucesso.");
       }
 
       navigate("/profile");
