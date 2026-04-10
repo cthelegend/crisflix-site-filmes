@@ -1,5 +1,5 @@
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Bookmark, Menu, Search, UserCircle2, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +9,7 @@ const Navbar = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { activeProfile, user } = useAuth();
 
@@ -23,6 +24,41 @@ const Navbar = () => {
     setMenuOpen(false);
     setQuery("");
   };
+
+  const openSearch = () => {
+    setSearchOpen(true);
+    setMenuOpen(false);
+    window.setTimeout(() => searchInputRef.current?.focus(), 0);
+  };
+
+  useEffect(() => {
+    const isTypingTarget = (target: EventTarget | null) => {
+      if (!(target instanceof HTMLElement)) return false;
+      const tagName = target.tagName.toLowerCase();
+      return tagName === "input" || tagName === "textarea" || tagName === "select" || target.isContentEditable;
+    };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closePanels();
+        return;
+      }
+
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        openSearch();
+        return;
+      }
+
+      if (event.key === "/" && !isTypingTarget(event.target)) {
+        event.preventDefault();
+        openSearch();
+      }
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  });
 
   const handleSearch = (e: FormEvent) => {
     e.preventDefault();
@@ -71,6 +107,7 @@ const Navbar = () => {
               className="flex items-center rounded-full border border-white/12 bg-white/10 backdrop-blur-md"
             >
               <input
+                ref={searchInputRef}
                 autoFocus
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}

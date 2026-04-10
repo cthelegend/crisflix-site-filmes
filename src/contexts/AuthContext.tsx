@@ -25,6 +25,7 @@ interface AuthContextValue {
   refreshProfile: () => Promise<void>;
   selectProfile: (profile: UserProfile) => void;
   clearActiveProfile: () => void;
+  uploadAvatar: (file: File) => Promise<string>;
   updateProfile: (payload: { displayName: string; avatarUrl: string | null }) => Promise<void>;
 }
 
@@ -35,6 +36,40 @@ async function fetchProfile(userId: string) {
   const { data, error } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle<UserProfile>();
   if (error) throw error;
   return data;
+}
+
+async function getOrCreateProfile(currentUser: User) {
+  if (!supabase) return null;
+
+  const existingProfile = await fetchProfile(currentUser.id);
+  if (existingProfile) return existingProfile;
+
+  const fallbackName =
+    typeof currentUser.user_metadata?.display_name === "string" && currentUser.user_metadata.display_name.trim()
+      ? currentUser.user_metadata.display_name.trim()
+      : currentUser.email?.split("@")[0] || "Meu perfil";
+
+  const { error } = await supabase.from("profiles").upsert({
+    id: currentUser.id,
+    display_name: fallbackName,
+    avatar_url: null,
+  });
+  if (error) throw error;
+
+  return fetchProfile(currentUser.id);
+}
+
+function getAuthRedirectUrl() {
+  if (typeof window === "undefined") return undefined;
+  return `${window.location.origin}/profile`;
+}
+
+function getSafeFileName(fileName: string) {
+  return fileName
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9.-]/g, "-")
+    .replace(/-+/g, "-");
 }
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
@@ -61,7 +96,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    const nextProfile = await fetchProfile(user.id);
+    const nextProfile = await getOrCreateProfile(user);
     setProfile(nextProfile);
 
     if (nextProfile) {
@@ -84,7 +119,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(currentSession?.user ?? null);
 
       if (currentSession?.user) {
-        const nextProfile = await fetchProfile(currentSession.user.id);
+        const nextProfile = await getOrCreateProfile(currentSession.user);
         setProfile(nextProfile);
         if (nextProfile) {
           const storedId = localStorage.getItem(ACTIVE_PROFILE_KEY);
@@ -105,7 +140,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       queueMicrotask(async () => {
         if (nextSession?.user) {
-          const nextProfile = await fetchProfile(nextSession.user.id);
+          const nextProfile = await getOrCreateProfile(nextSession.user);
           setProfile(nextProfile);
 
           if (nextProfile) {
@@ -146,16 +181,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { display_name: displayName } },
+          options: {
+            data: { display_name: displayName },
+            emailRedirectTo: getAuthRedirectUrl(),
+          },
         });
         if (error) throw error;
 
-        if (data.user) {
-          await supabase.from("profiles").upsert({
+        if (data.user && data.session) {
+          const { error: profileError } = await supabase.from("profiles").upsert({
             id: data.user.id,
             display_name: displayName,
             avatar_url: null,
           });
+          if (profileError) throw profileError;
+          await supabase.auth.signOut();
         }
       },
       signOut: async () => {
@@ -166,6 +206,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       refreshProfile,
       selectProfile,
       clearActiveProfile,
+      uploadAvatar: async (file) => {
+        if (!supabase || !user) throw new Error("Sessão indisponível.");
+        if (!file.type.startsWith("image/")) throw new Error("Escolha um arquivo de imagem.");
+
+        const safeName = getSafeFileName(file.name || "avatar.jpg");
+        const path = `${user.id}/${Date.now()}-${safeName}`;
+
+        const { error } = await supabase.storage.from("avatars").upload(path, file, {
+          cacheControl: "3600",
+          contentType: file.type,
+          upsert: true,
+        });
+        if (error) throw error;
+
+        const { data } = supabase.storage.from("avatars").getPublicUrl(path);
+        return data.publicUrl;
+      },
       updateProfile: async ({ displayName, avatarUrl }) => {
         if (!supabase || !user) throw new Error("Sessão indisponível.");
         const { error } = await supabase.from("profiles").upsert({
