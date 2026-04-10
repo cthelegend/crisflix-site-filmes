@@ -131,15 +131,15 @@ export interface Episode {
   runtime: number | null;
 }
 
-export const getTrending = () => fetchTMDB<TMDBResponse>("/trending/all/week");
+export const getTrending = (page = 1) => fetchTMDB<TMDBResponse>("/trending/all/week", { page: String(page) });
 
-export const getPopularMovies = () => fetchTMDB<TMDBResponse>("/movie/popular");
-export const getTopRatedMovies = () => fetchTMDB<TMDBResponse>("/movie/top_rated");
-export const getNowPlayingMovies = () => fetchTMDB<TMDBResponse>("/movie/now_playing");
-export const getUpcomingMovies = () => fetchTMDB<TMDBResponse>("/movie/upcoming");
+export const getPopularMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/popular", { page: String(page) });
+export const getTopRatedMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/top_rated", { page: String(page) });
+export const getNowPlayingMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/now_playing", { page: String(page) });
+export const getUpcomingMovies = (page = 1) => fetchTMDB<TMDBResponse>("/movie/upcoming", { page: String(page) });
 
-export const getPopularTV = () => fetchTMDB<TMDBResponse>("/tv/popular");
-export const getTopRatedTV = () => fetchTMDB<TMDBResponse>("/tv/top_rated");
+export const getPopularTV = (page = 1) => fetchTMDB<TMDBResponse>("/tv/popular", { page: String(page) });
+export const getTopRatedTV = (page = 1) => fetchTMDB<TMDBResponse>("/tv/top_rated", { page: String(page) });
 
 export const getMovieDetails = (id: number) =>
   fetchTMDB<MovieDetails>(`/movie/${id}`, { append_to_response: "external_ids,credits" });
@@ -156,11 +156,11 @@ export const getIMDbUrl = (imdbId?: string | null) =>
 export const searchMulti = (query: string) =>
   fetchTMDB<TMDBResponse>("/search/multi", { query });
 
-export const getMoviesByGenre = (genreId: number) =>
-  fetchTMDB<TMDBResponse>("/discover/movie", { with_genres: String(genreId) });
+export const getMoviesByGenre = (genreId: number, page = 1) =>
+  fetchTMDB<TMDBResponse>("/discover/movie", { with_genres: String(genreId), page: String(page) });
 
-export const getTVByGenre = (genreId: number) =>
-  fetchTMDB<TMDBResponse>("/discover/tv", { with_genres: String(genreId) });
+export const getTVByGenre = (genreId: number, page = 1) =>
+  fetchTMDB<TMDBResponse>("/discover/tv", { with_genres: String(genreId), page: String(page) });
 
 export const MOVIE_GENRES: { id: number; name: string }[] = [
   { id: 28, name: "Ação" },
