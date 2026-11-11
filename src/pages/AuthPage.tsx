@@ -88,7 +88,7 @@ const AuthPage = () => {
   return (
     <div className="revolution-screen relative min-h-screen overflow-hidden bg-black">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(229,9,20,0.28),transparent_28%),linear-gradient(180deg,rgba(0,0,0,0.35),rgba(0,0,0,0.88))]" />
-      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url('https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1600&q=80')", backgroundSize: "cover", backgroundPosition: "center" }} />
+      <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url('/login-background.png')", backgroundSize: "cover", backgroundPosition: "center" }} />
 
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
         <section className="w-full max-w-md rounded-[2rem] border border-white/10 bg-black/72 p-5 backdrop-blur-2xl sm:p-7">
