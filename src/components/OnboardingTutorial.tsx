@@ -62,7 +62,7 @@ const OnboardingTutorial = ({ userId, activeProfile }: OnboardingTutorialProps) 
           <p className="text-xs font-semibold uppercase tracking-[0.32em] text-primary">Primeiro acesso</p>
           <DialogTitle className="text-2xl font-bold text-white sm:text-3xl">Seu painel está pronto</DialogTitle>
           <DialogDescription className="text-sm leading-6 text-white/62">
-            Um guia rápido para você navegar melhor pelo CRISFLIX.
+            Um guia rápido para você navegar melhor pelo FOICE & FILME.
           </DialogDescription>
         </DialogHeader>
 

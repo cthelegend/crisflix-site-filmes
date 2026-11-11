@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, BookmarkPlus, Calendar, Check, Clock3, ExternalLink, Play, SkipForward, Users2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -441,15 +441,6 @@ const Details = () => {
           </section>
         )}
 
-        <section className="mt-10 rounded-[2rem] bg-white/[0.025] p-6 text-white/66">
-          <h2 className="text-xl font-semibold text-white">Avisos legais</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7">
-            Para notificacoes DMCA, termos de uso e politica de remocao de conteudo, acesse a pagina legal completa do projeto.
-          </p>
-          <Link to="/legal/dmca" className="mt-4 inline-flex text-sm text-primary hover:text-primary/80">
-            Abrir pagina de DMCA e Termos
-          </Link>
-        </section>
       </main>
 
       <SiteFooter />

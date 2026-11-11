@@ -34,7 +34,7 @@ const DisclaimerPopup = () => {
 
           <div className="mt-5">
             <p className="text-sm leading-6 text-white/78 md:text-base md:leading-7">
-              O <span className="font-semibold text-primary">CRISFLIX</span> é um projeto independente, criado para fins
+              O <span className="font-semibold text-primary">FOICE & FILME</span> é um projeto independente, criado para fins
               educacionais e mantido sem objetivos comerciais.
             </p>
 
@@ -70,17 +70,6 @@ const DisclaimerPopup = () => {
             </button>
           </div>
 
-          <div className="mt-4 border-t border-white/8 pt-3 text-[10px] leading-5 text-white/46 sm:text-[11px]">
-            <p className="font-medium text-white/56">Remoção de conteúdo</p>
-            <p className="mt-1">
-              Não hospedamos, armazenamos ou distribuímos conteúdo protegido por direitos autorais. Caso você seja detentor de
-              direitos e deseje a remoção de algum conteúdo, entre em contato pelo e-mail{" "}
-              <a href="mailto:cristhianbarbosap@gmail.com" className="text-primary hover:underline">
-                cristhianbarbosap@gmail.com
-              </a>
-              .
-            </p>
-          </div>
         </div>
       </div>
     </div>

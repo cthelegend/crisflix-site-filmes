@@ -35,10 +35,11 @@ const MovieRow = ({ title, fetchFn, items: initialItems, type }: MovieRowProps) 
   return (
     <section className="mb-8 px-4 md:mb-10 md:px-12">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold tracking-tight text-foreground md:text-[1.35rem]">{title}</h2>
+        <h2 className="border-l-[3px] border-primary pl-3 text-lg font-semibold tracking-tight text-foreground md:text-[1.35rem]">{title}</h2>
       </div>
       <div className="group relative">
         <button
+          aria-label={`Ver títulos anteriores em ${title}`}
           onClick={() => scroll("left")}
           className="absolute bottom-12 left-0 top-0 z-10 hidden w-12 items-center justify-center rounded-r-full bg-black/45 text-white opacity-0 transition-opacity group-hover:opacity-100 md:flex"
         >
@@ -46,13 +47,14 @@ const MovieRow = ({ title, fetchFn, items: initialItems, type }: MovieRowProps) 
         </button>
         <div
           ref={scrollRef}
-          className="row-mask flex gap-3 overflow-x-auto pb-4 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-hidden"
+          className="catalog-row row-mask flex gap-3 overflow-x-auto pb-4 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-hidden"
         >
           {items.map((item) => (
             <MovieCard key={`${item.media_type || type}-${item.id}`} item={item} type={type} />
           ))}
         </div>
         <button
+          aria-label={`Ver próximos títulos em ${title}`}
           onClick={() => scroll("right")}
           className="absolute bottom-12 right-0 top-0 z-10 hidden w-12 items-center justify-center rounded-l-full bg-black/45 text-white opacity-0 transition-opacity group-hover:opacity-100 md:flex"
         >

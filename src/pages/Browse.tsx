@@ -69,8 +69,8 @@ const Browse = () => {
           <div className="mt-8 flex flex-wrap gap-3">
             <button
               onClick={() => setSearchParams({})}
-              className={`rounded-full px-4 py-2 text-sm transition-colors ${
-                !selectedGenre ? "bg-white text-black" : "bg-white/8 text-white/74 hover:bg-white/12"
+              className={`min-h-11 rounded-full px-4 py-2 text-sm transition-colors ${
+                !selectedGenre ? "bg-primary text-white" : "bg-white/8 text-white/74 hover:bg-white/12"
               }`}
             >
               Em destaque
@@ -79,8 +79,8 @@ const Browse = () => {
               <button
                 key={genre.id}
                 onClick={() => setSearchParams({ genre: String(genre.id) })}
-                className={`rounded-full px-4 py-2 text-sm transition-colors ${
-                  String(genre.id) === selectedGenre ? "bg-white text-black" : "bg-white/8 text-white/74 hover:bg-white/12"
+                className={`min-h-11 rounded-full px-4 py-2 text-sm transition-colors ${
+                  String(genre.id) === selectedGenre ? "bg-primary text-white" : "bg-white/8 text-white/74 hover:bg-white/12"
                 }`}
               >
                 {genre.name}

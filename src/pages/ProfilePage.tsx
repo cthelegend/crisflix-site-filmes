@@ -1,3 +1,4 @@
+import Brand from "@/components/Brand";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Camera, ImageIcon, UserCircle2 } from "lucide-react";
@@ -97,15 +98,13 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black">
+    <div className="revolution-screen relative min-h-screen overflow-hidden bg-black">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(229,9,20,0.22),transparent_24%),linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.92))]" />
 
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
         <section className="w-full max-w-5xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="text-3xl font-bold tracking-[0.16em] text-primary" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
-              CRISFLIX
-            </p>
+            <div className="text-center"><Brand centered /></div>
             <h1 className="mt-8 text-3xl font-bold text-white sm:text-4xl md:text-5xl">Quem está assistindo?</h1>
             <p className="mt-3 text-sm leading-6 text-white/54 md:text-base">
               Escolha seu perfil para continuar.

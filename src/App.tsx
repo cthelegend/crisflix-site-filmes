@@ -10,13 +10,11 @@ import Watch from "./pages/Watch";
 import SearchPage from "./pages/SearchPage";
 import Browse from "./pages/Browse";
 import NotFound from "./pages/NotFound";
-import DmcaTerms from "./pages/DmcaTerms";
-import Channels from "./pages/Channels";
-import ChannelWatch from "./pages/ChannelWatch";
 import Donate from "./pages/Donate";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import MyListPage from "./pages/MyListPage";
+import BackgroundPattern from "./components/BackgroundPattern";
 
 const queryClient = new QueryClient();
 
@@ -27,21 +25,23 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/details/:type/:id" element={<Details />} />
-            <Route path="/watch/:type/:id" element={<Watch />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/browse/:category" element={<Browse />} />
-            <Route path="/channels" element={<Channels />} />
-            <Route path="/watch/channel/:slug" element={<ChannelWatch />} />
-            <Route path="/donate" element={<Donate />} />
-            <Route path="/auth" element={<AuthPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/my-list" element={<MyListPage />} />
-            <Route path="/legal/dmca" element={<DmcaTerms />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <div className="site-shell">
+            <BackgroundPattern />
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/details/:type/:id" element={<Details />} />
+              <Route path="/watch/:type/:id" element={<Watch />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/browse/:category" element={<Browse />} />
+              {/* Retired channel links must not reach the movie/TV player. */}
+              <Route path="/watch/channel/*" element={<NotFound />} />
+              <Route path="/donate" element={<Donate />} />
+              <Route path="/auth" element={<AuthPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/my-list" element={<MyListPage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
         </BrowserRouter>
       </TooltipProvider>
     </AuthProvider>

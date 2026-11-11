@@ -1,8 +1,17 @@
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Bookmark, Menu, Search, UserCircle2, X } from "lucide-react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { Bookmark, Film, Heart, Home, Menu, Search, Tv, UserCircle2, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import Brand from "./Brand";
+import { GlassTabBar, GlassTabBarItem } from "./ui/glass-tab-bar";
+
+const destinations = [
+  { to: "/", label: "Início", icon: Home },
+  { to: "/browse/movies", label: "Filmes", icon: Film },
+  { to: "/browse/tv", label: "Séries", icon: Tv },
+  { to: "/my-list", label: "Minha lista", icon: Bookmark },
+];
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
@@ -10,12 +19,16 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [query, setQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchButtonRef = useRef<HTMLButtonElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { activeProfile, user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 32);
-    window.addEventListener("scroll", onScroll);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -25,175 +38,97 @@ const Navbar = () => {
     setQuery("");
   };
 
+  useEffect(closePanels, [location.pathname, location.search]);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (searchOpen) searchInputRef.current?.focus();
+  }, [searchOpen]);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeMobileMenu = () => { if (desktop.matches) setMenuOpen(false); };
+    desktop.addEventListener("change", closeMobileMenu);
+    return () => desktop.removeEventListener("change", closeMobileMenu);
+  }, []);
+
   const openSearch = () => {
     setSearchOpen(true);
     setMenuOpen(false);
-    window.setTimeout(() => searchInputRef.current?.focus(), 0);
   };
 
   useEffect(() => {
-    const isTypingTarget = (target: EventTarget | null) => {
-      if (!(target instanceof HTMLElement)) return false;
-      const tagName = target.tagName.toLowerCase();
-      return tagName === "input" || tagName === "textarea" || tagName === "select" || target.isContentEditable;
-    };
-
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         closePanels();
+        if (searchOpen) searchButtonRef.current?.focus();
+        else if (menuOpen) menuButtonRef.current?.focus();
         return;
       }
-
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        openSearch();
-        return;
-      }
-
-      if (event.key === "/" && !isTypingTarget(event.target)) {
+      const target = event.target;
+      const isTyping = target instanceof HTMLElement &&
+        (target.matches("input, textarea, select") || target.isContentEditable);
+      if (((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") || (event.key === "/" && !isTyping)) {
         event.preventDefault();
         openSearch();
       }
     };
-
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  });
+  }, [searchOpen, menuOpen]);
 
-  const handleSearch = (e: FormEvent) => {
-    e.preventDefault();
+  const handleSearch = (event: FormEvent) => {
+    event.preventDefault();
     if (!query.trim()) return;
     navigate(`/search?q=${encodeURIComponent(query.trim())}`);
     closePanels();
   };
 
   return (
-    <nav
-      className={`fixed inset-x-0 top-0 z-50 px-4 py-4 md:px-8 lg:px-12 ${
-        scrolled ? "bg-background/78 backdrop-blur-2xl" : "bg-gradient-to-b from-black/70 to-transparent"
-      } transition-all duration-300`}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-4 lg:gap-8">
-          <Link
-            to="/"
-            onClick={closePanels}
-            className="text-2xl font-bold tracking-[0.18em] text-primary md:text-3xl"
-            style={{ fontFamily: "'Bebas Neue', sans-serif" }}
-          >
-            CRISFLIX
-          </Link>
-
-          <div className="hidden items-center gap-4 text-sm text-white/72 lg:flex xl:gap-6">
-            <Link to="/" className="transition-colors hover:text-white">
-              Início
-            </Link>
-            <Link to="/browse/movies" className="transition-colors hover:text-white">
-              Filmes
-            </Link>
-            <Link to="/browse/tv" className="transition-colors hover:text-white">
-              Séries
-            </Link>
-            <Link to="/channels" className="transition-colors hover:text-white">
-              Canais
-            </Link>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-3">
-          {searchOpen ? (
-            <form
-              onSubmit={handleSearch}
-              className="flex items-center rounded-full border border-white/12 bg-white/10 backdrop-blur-md"
-            >
-              <input
-                ref={searchInputRef}
-                autoFocus
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Títulos, gêneros..."
-                className="w-28 bg-transparent px-4 py-2 text-sm text-white outline-none placeholder:text-white/45 sm:w-40 lg:w-56"
-              />
-              <button type="button" onClick={closePanels} className="px-3 text-white/70 transition-colors hover:text-white">
-                <X size={16} />
-              </button>
-            </form>
-          ) : (
-            <button onClick={() => setSearchOpen(true)} className="text-white/72 transition-colors hover:text-white">
-              <Search size={20} />
+    <>
+      {(menuOpen || searchOpen) && <button type="button" onClick={closePanels} aria-label="Fechar painel de navegação" className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm" />}
+      <header className={`site-header fixed inset-x-0 top-0 z-50 px-4 py-3 transition-colors md:px-8 lg:px-12 ${scrolled || searchOpen || menuOpen ? "bg-background/95 backdrop-blur-2xl" : "bg-gradient-to-b from-black/80 to-transparent"}`}>
+        <div className="flex items-center justify-between gap-2">
+          <Brand onClick={closePanels} />
+          <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+            <button ref={searchButtonRef} type="button" onClick={() => searchOpen ? closePanels() : openSearch()} aria-label={searchOpen ? "Fechar busca" : "Buscar filmes e séries"} aria-expanded={searchOpen} aria-controls="site-search" className="nav-icon">
+              {searchOpen ? <X size={20} /> : <Search size={20} />}
             </button>
-          )}
-
-          {user && (
-            <Link
-              to="/my-list"
-              className="hidden items-center justify-center rounded-full border border-white/10 bg-white/6 p-2.5 text-white/78 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
-              aria-label="Minha lista"
-            >
-              <Bookmark size={16} />
+            <Link to={user ? "/profile" : "/auth"} aria-label={user ? "Meu perfil" : "Entrar"} className="nav-icon hidden sm:inline-flex">
+              {activeProfile?.avatar_url ? <img src={activeProfile.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover" /> : <UserCircle2 size={22} />}
             </Link>
-          )}
-
-          <Link
-            to={user ? "/profile" : "/auth"}
-            className="hidden items-center gap-2 rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm text-white/78 transition-colors hover:bg-white/10 hover:text-white md:inline-flex"
-          >
-            {user ? (
-              activeProfile?.avatar_url ? (
-                <img
-                  src={activeProfile.avatar_url}
-                  alt="Meu Perfil"
-                  className="h-5 w-5 rounded-full object-cover ring-1 ring-white/12"
-                />
-              ) : (
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-white/10 ring-1 ring-white/12">
-                  <UserCircle2 size={14} />
-                </div>
-              )
-            ) : (
-              <UserCircle2 size={18} />
-            )}
-            {user ? "Meu Perfil" : "Entrar"}
-          </Link>
-
-          <button
-            onClick={() => setMenuOpen((current) => !current)}
-            className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/6 p-2.5 text-white/78 transition-colors hover:bg-white/10 hover:text-white lg:hidden"
-            aria-label="Abrir menu"
-          >
-            {menuOpen ? <X size={18} /> : <Menu size={18} />}
-          </button>
-        </div>
-      </div>
-
-      {menuOpen && (
-        <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-black/72 p-4 backdrop-blur-2xl lg:hidden">
-          <div className="grid gap-2 text-sm text-white/78">
-            <Link to="/" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              Início
-            </Link>
-            <Link to="/browse/movies" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              Filmes
-            </Link>
-            <Link to="/browse/tv" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              Séries
-            </Link>
-            <Link to="/channels" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              Canais
-            </Link>
-            <Link to="/my-list" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              Minha Lista
-            </Link>
-            <Link to={user ? "/profile" : "/auth"} onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              {user ? "Meu Perfil" : "Entrar"}
-            </Link>
-            <Link to="/donate" onClick={closePanels} className="rounded-2xl px-3 py-3 transition-colors hover:bg-white/8 hover:text-white">
-              Doar
-            </Link>
+            <Link to="/donate" aria-label="Apoie o projeto" className="nav-icon hidden lg:inline-flex"><Heart size={20} /></Link>
+            <button ref={menuButtonRef} type="button" onClick={() => { setMenuOpen(!menuOpen); setSearchOpen(false); }} aria-label={menuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={menuOpen} aria-controls="site-menu" className="nav-icon lg:hidden">
+              {menuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
         </div>
-      )}
-    </nav>
+        {searchOpen && (
+          <form id="site-search" role="search" onSubmit={handleSearch} className="mx-auto mt-4 flex max-w-3xl gap-2 pb-1">
+            <label htmlFor="catalog-search" className="sr-only">Buscar no catálogo</label>
+            <input id="catalog-search" ref={searchInputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Qual filme ou série você procura?" type="search" enterKeyHint="search" className="h-12 min-w-0 flex-1 rounded-full border border-primary/40 bg-black/40 px-3 text-base text-white placeholder:text-white/55" />
+            <button type="submit" className="min-h-12 shrink-0 rounded-full bg-primary px-4 text-sm font-semibold text-white hover:bg-red-700">Buscar</button>
+          </form>
+        )}
+        {menuOpen && (
+          <nav id="site-menu" aria-label="Todas as seções" className="mx-auto mt-4 grid max-h-[65dvh] max-w-3xl gap-1 overflow-y-auto rounded-[1.5rem] border border-primary/25 bg-black/90 p-3 lg:hidden">
+            {destinations.map(({ to, label, icon: Icon }) => (
+              <NavLink key={to} to={to} end={to === "/"} onClick={closePanels} className={({ isActive }) => `flex min-h-12 items-center gap-3 rounded-2xl px-3 text-sm ${isActive ? "bg-primary text-white" : "text-white/85 hover:bg-primary/20"}`}><Icon size={18} />{label}</NavLink>
+            ))}
+            <Link to={user ? "/profile" : "/auth"} onClick={closePanels} className="flex min-h-12 items-center gap-3 rounded-2xl px-3 text-sm hover:bg-primary/20"><UserCircle2 size={18} />{user ? "Meu perfil" : "Entrar / criar conta"}</Link>
+            <Link to="/donate" onClick={closePanels} className="flex min-h-12 items-center gap-3 rounded-2xl px-3 text-sm hover:bg-primary/20"><Heart size={18} />Apoie o projeto</Link>
+          </nav>
+        )}
+      </header>
+      <GlassTabBar aria-label="Navegação principal" value={location.pathname} className="navigation-dock">
+        {destinations.map(({ to, label, icon: Icon }) => (
+          <GlassTabBarItem key={to} to={to} value={to} label={label} icon={<Icon size={23} />} onClick={closePanels} />
+        ))}
+      </GlassTabBar>
+    </>
   );
 };
 

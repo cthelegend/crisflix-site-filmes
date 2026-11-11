@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Movie, formatDisplayedRating, getImageUrl } from "@/lib/tmdb";
 
 interface MovieCardProps {
@@ -7,17 +7,17 @@ interface MovieCardProps {
 }
 
 const MovieCard = ({ item, type }: MovieCardProps) => {
-  const navigate = useNavigate();
   const mediaType = type || item.media_type || (item.title ? "movie" : "tv");
   const title = item.title || item.name || "";
   const year = (item.release_date || item.first_air_date || "").slice(0, 4);
 
   return (
-    <article
-      onClick={() => navigate(`/details/${mediaType}/${item.id}`)}
-      className="group/card relative w-[152px] flex-shrink-0 cursor-pointer md:w-[208px]"
+    <Link
+      to={`/details/${mediaType}/${item.id}`}
+      aria-label={`Ver detalhes de ${title}`}
+      className="group/card block relative w-[152px] flex-shrink-0 cursor-pointer md:w-[208px]"
     >
-      <div className="relative aspect-[2/3] overflow-hidden rounded-[1.35rem] bg-secondary/70 shadow-[0_20px_60px_rgba(0,0,0,0.28)] transition duration-300">
+      <div className="relative aspect-[2/3] overflow-hidden rounded-[1.35rem] border border-primary/15 group-hover/card:border-primary/70 bg-secondary/70 shadow-[0_20px_60px_rgba(0,0,0,0.28)] transition duration-300">
         <img
           src={getImageUrl(item.poster_path)}
           alt={title}
@@ -42,7 +42,7 @@ const MovieCard = ({ item, type }: MovieCardProps) => {
           <p className="line-clamp-2 text-sm font-medium leading-5 text-white drop-shadow">{title}</p>
         </div>
       </div>
-    </article>
+    </Link>
   );
 };
 

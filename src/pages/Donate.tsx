@@ -16,7 +16,7 @@ const Donate = () => {
               <p className="text-[11px] uppercase tracking-[0.34em] text-primary/80 md:text-sm md:tracking-[0.35em]">Apoio</p>
               <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl md:text-5xl">Ajude a manter o projeto no ar</h1>
               <p className="mt-5 text-sm leading-7 text-white/68 md:text-base">
-                O CRISFLIX é um projeto sem fins lucrativos. Se você gosta da proposta e quer ajudar com custos de manutenção,
+                O FOICE & FILME é um projeto sem fins lucrativos. Se você gosta da proposta e quer ajudar com custos de manutenção,
                 melhorias e continuidade, pode apoiar com uma doação via Pix.
               </p>
 
@@ -30,19 +30,6 @@ const Donate = () => {
                 </p>
               </div>
 
-              <div className="mt-6 rounded-[1.6rem] border border-white/10 bg-black/25 p-5">
-                <div className="flex items-center gap-2 text-white">
-                  <QrCode size={18} className="text-primary" />
-                  <h2 className="text-lg font-semibold">Remoção de conteúdo</h2>
-                </div>
-                <p className="mt-3 text-sm leading-7 text-white/62">
-                  Caso você seja detentor de direitos autorais e deseje a remoção de algum conteúdo, entre em contato pelo e-mail{" "}
-                  <a href="mailto:cristhianbarbosap@gmail.com" className="text-primary hover:underline">
-                    cristhianbarbosap@gmail.com
-                  </a>
-                  .
-                </p>
-              </div>
             </div>
 
             <div>

@@ -1,7 +1,9 @@
 
-# 🎬 CrisFlix
+# 🎬 FOICE & FILME
 
-Plataforma de streaming inspirada na Netflix, desenvolvida para exibição de filmes, séries e conteúdos em uma interface moderna, rápida e responsiva.
+**Todas as mídias para todo povo**
+
+Plataforma de streaming com identidade visual vermelha inspirada em cartazes e símbolos comunistas, desenvolvida para exibição de filmes, séries e conteúdos em uma interface moderna, rápida e responsiva.
 
 🔗 **Acesse o projeto:**
 👉 [Acessar](https://crissflix.vercel.app/)
@@ -10,7 +12,6 @@ Plataforma de streaming inspirada na Netflix, desenvolvida para exibição de fi
 
 ## 🚀 Funcionalidades
 
-* 📺 Listagem de canais
 * 🎨 Interface estilo Netflix
 * 🖼️ Cards com imagens dinâmicas
 * ⚡ Alta performance com Vite
@@ -44,7 +45,6 @@ npm run dev
 
 * 🔐 ~~Autenticação~~
 * ❤️ ~~Favoritos~~
-* ➕ Novos canais
 ---
 
 ## 📄 Licença

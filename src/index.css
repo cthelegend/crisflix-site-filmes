@@ -1,4 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@font-face {
+  font-family: 'Russo One';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/russo-one-latin-400-normal.woff2') format('woff2');
+}
 
 @tailwind base;
 @tailwind components;
@@ -93,5 +101,115 @@
   }
   .row-mask {
     mask-image: linear-gradient(to right, transparent, black 2%, black 98%, transparent);
+  }
+}
+
+/* Preserve the original cinema UI; decorative PNGs stay behind the content. */
+@layer base {
+  html { scroll-padding-top: 6rem; }
+  body { margin: 0; }
+  ::selection { background: hsl(var(--primary)); color: white; }
+  :focus-visible { outline: 2px solid hsl(var(--primary)); outline-offset: 4px; }
+}
+@layer components {
+  .brand-name {
+    font-family: 'Russo One', Impact, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.015em;
+    color: hsl(var(--primary));
+  }
+  .nav-icon {
+    display: inline-flex;
+    min-width: 44px;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 9999px;
+    color: rgb(255 255 255 / 0.8);
+    background: rgb(255 255 255 / 0.06);
+  }
+  .nav-icon:hover { background: rgb(255 255 255 / 0.12); color: white; }
+  .site-header { padding-top: calc(0.75rem + env(safe-area-inset-top)); }
+  .site-shell {
+    position: relative;
+    isolation: isolate;
+    min-height: 100svh;
+    background-color: hsl(var(--background));
+  }
+  .background-pattern {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .site-shell .min-h-screen.bg-background, .site-shell .revolution-screen {
+    background-color: transparent;
+  }
+  .hero-red-wash {
+    pointer-events: none;
+    background: radial-gradient(ellipse at 0% 30%, rgb(175 10 28 / 0.4), transparent 65%), linear-gradient(110deg, rgb(110 0 16 / 0.24), transparent 65%);
+  }
+  .navigation-dock {
+    position: fixed;
+    bottom: calc(18px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    max-width: calc(100vw - 24px);
+  }
+  .liquid-glass {
+    padding: 5px;
+    border-radius: 9999px;
+    border: 1px solid rgb(255 255 255 / 0.16);
+    background: rgb(22 16 18 / 0.78);
+    backdrop-filter: blur(24px) saturate(160%);
+    -webkit-backdrop-filter: blur(24px) saturate(160%);
+    box-shadow: inset 1px 1px 0 rgb(255 255 255 / 0.2), inset -1px -1px 0 rgb(255 255 255 / 0.05), 0 12px 40px rgb(0 0 0 / 0.5);
+  }
+  .glass-tab-bar-list { position: relative; display: flex; align-items: center; }
+  .glass-tab-bar-indicator {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 9999px;
+    background: linear-gradient(145deg, rgb(239 52 62 / 0.36), rgb(147 19 30 / 0.2));
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3), inset 0 0 0 1px rgb(255 126 126 / 0.2), 0 3px 12px rgb(0 0 0 / 0.15);
+    transition: left 450ms cubic-bezier(0.34, 1.3, 0.64, 1), width 450ms cubic-bezier(0.34, 1.3, 0.64, 1);
+  }
+  .glass-tab-bar-item {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: clamp(64px, 20vw, 88px);
+    min-height: 58px;
+    border-radius: 9999px;
+    color: rgb(255 255 255 / 0.65);
+    font-size: 10px;
+    font-weight: 600;
+    transition: color 200ms, transform 200ms;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .glass-tab-bar-item:hover { color: white; }
+  .glass-tab-bar-item:active { transform: scale(0.95); }
+  .glass-tab-bar-item[aria-current="page"] { color: #ffb6ba; }
+  .min-h-screen:has(.navigation-dock) { padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
+}
+@media (max-width: 1023px) {
+  .catalog-row { scroll-snap-type: x proximity; }
+  .catalog-row > * { scroll-snap-align: start; }
+}
+@media (max-width: 374px) {
+  .site-header .brand-name { font-size: 0.9rem; }
+  .site-header { padding-inline: 0.75rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
