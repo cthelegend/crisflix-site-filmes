@@ -3,8 +3,8 @@ import { Link } from "react-router-dom";
 
 const SiteFooter = () => {
   return (
-    <footer className="site-footer border-t border-white/10 bg-black px-4 py-10 md:px-8 lg:px-12">
-      <div className="flex flex-col gap-6 text-center md:flex-row md:items-end md:justify-between md:text-left">
+    <footer className="site-footer border-t border-white/10 bg-black px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-10 md:px-8 lg:px-12">
+      <div className="flex flex-col gap-6 text-center md:flex-row md:items-center md:justify-between md:text-left">
         <div className="mx-auto md:mx-0">
           <Brand />
         </div>

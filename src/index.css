@@ -196,7 +196,9 @@
   .glass-tab-bar-item:hover { color: white; }
   .glass-tab-bar-item:active { transform: scale(0.95); }
   .glass-tab-bar-item[aria-current="page"] { color: #ffb6ba; }
-  .min-h-screen:has(.navigation-dock) { padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
+  .site-shell > .min-h-screen:has(.site-footer) { display: flex; flex-direction: column; }
+  .site-footer { margin-top: auto; }
+  .min-h-screen:has(.navigation-dock):not(:has(.site-footer)) { padding-bottom: calc(108px + env(safe-area-inset-bottom)); }
 }
 @media (max-width: 1023px) {
   .catalog-row { scroll-snap-type: x proximity; }
