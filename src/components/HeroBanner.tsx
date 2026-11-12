@@ -85,14 +85,14 @@ const HeroBanner = () => {
           <div className="mt-7 flex flex-col gap-3 animate-fade-in sm:flex-row sm:flex-wrap">
             <Button
               onClick={() => navigate(`/watch/${type}/${featured.id}`)}
-              className="h-12 rounded-full border border-primary bg-primary px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-700"
+              className="hero-glass-button h-12 rounded-full px-7 text-sm font-semibold"
             >
               <Play size={18} fill="currentColor" /> Assistir agora
             </Button>
             <Button
               onClick={() => navigate(`/details/${type}/${featured.id}`)}
               variant="secondary"
-              className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
+              className="hero-glass-button hero-glass-button-secondary h-12 rounded-full px-7 text-sm font-semibold"
             >
               <Info size={18} /> Mais informações
             </Button>
