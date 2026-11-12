@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import MovieCard from "@/components/MovieCard";
-import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import {
   MOVIE_GENRES,
@@ -59,7 +58,6 @@ const Browse = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main className="browse-content px-4 pb-10 pt-24 md:px-12 md:pb-16 md:pt-28">
         <section className="rounded-2xl md:rounded-[2.5rem] bg-[radial-gradient(circle_at_top_right,rgba(229,9,20,0.18),transparent_30%),linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01))] p-4 md:p-8">
           <p className="text-xs uppercase tracking-[0.36em] text-white/44">Catálogo</p>
@@ -104,7 +102,7 @@ const Browse = () => {
           {loading ? (
             <p className="text-white/54">Carregando catálogo...</p>
           ) : (
-            <div className="media-grid grid grid-cols-3 gap-x-2.5 gap-y-4 sm:grid-cols-3 md:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+            <div className="media-grid animate-fade-in grid grid-cols-3 gap-x-2.5 gap-y-4 sm:grid-cols-3 md:gap-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
               {items.map((item) => (
                 <MovieCard key={`${item.id}-${item.media_type || category}`} item={item} type={isMovies ? "movie" : "tv"} />
               ))}

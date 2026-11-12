@@ -1,5 +1,4 @@
 import { Heart, QrCode } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 
 const DONATION_WIDGET_URL = "https://widget.livepix.gg/embed/9d6ba6a3-a111-45de-9c4a-e354b1100a4c";
@@ -7,7 +6,6 @@ const DONATION_WIDGET_URL = "https://widget.livepix.gg/embed/9d6ba6a3-a111-45de-
 const Donate = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
 
       <main className="px-4 pb-16 pt-24 md:px-12 md:pt-28">
         <section className="mx-auto max-w-6xl rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-7 md:p-10">

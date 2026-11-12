@@ -1,10 +1,8 @@
-import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 
 export default function About() {
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <main className="flex-1 px-4 pb-12 pt-24 md:px-12 md:pb-20 md:pt-28">
         <header className="mx-auto max-w-4xl text-center">
           <img

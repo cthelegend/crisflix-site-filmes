@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import Navbar from "@/components/Navbar";
 import MovieCard from "@/components/MovieCard";
 import SiteFooter from "@/components/SiteFooter";
 import { Movie, searchMulti } from "@/lib/tmdb";
@@ -21,7 +20,6 @@ const SearchPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
       <div className="pt-24 px-4 md:px-12 pb-16">
         <h1 className="mb-4 break-words text-lg font-bold text-foreground md:mb-6 md:text-2xl">
           Resultados para: <span className="text-muted-foreground">{query}</span>
@@ -31,7 +29,7 @@ const SearchPage = () => {
         ) : results.length === 0 ? (
           <p className="text-muted-foreground">Nenhum resultado encontrado.</p>
         ) : (
-          <div className="media-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-x-2.5 gap-y-4 md:gap-4">
+          <div className="media-grid animate-fade-in grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-x-2.5 gap-y-4 md:gap-4">
             {results.map((item) => (
               <MovieCard key={item.id} item={item} />
             ))}

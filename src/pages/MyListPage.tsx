@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Bookmark } from "lucide-react";
-import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import MovieCard from "@/components/MovieCard";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,7 +31,7 @@ const GridSection = ({ title, icon, items, emptyText }: { title: string; icon: R
     </div>
 
     {items.length ? (
-      <div className="media-grid grid grid-cols-3 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="media-grid animate-fade-in grid grid-cols-3 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         {items.map((item) => (
           <MovieCard key={`${item.media_type}-${item.id}`} item={item} type={item.media_type as "movie" | "tv"} />
         ))}
@@ -61,7 +60,6 @@ const MyListPage = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
 
       <main className="px-4 pb-16 pt-24 md:px-12 md:pt-28">
         <section className="mx-auto max-w-7xl space-y-10">

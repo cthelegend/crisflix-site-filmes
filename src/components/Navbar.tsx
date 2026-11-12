@@ -40,10 +40,6 @@ const Navbar = () => {
   useEffect(closePanels, [location.pathname, location.search]);
 
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [location.pathname]);
-
-  useEffect(() => {
     if (searchOpen) searchInputRef.current?.focus();
   }, [searchOpen]);
 

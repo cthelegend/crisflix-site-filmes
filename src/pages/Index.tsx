@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import HeroBanner from "@/components/HeroBanner";
 import MovieRow from "@/components/MovieRow";
-import Navbar from "@/components/Navbar";
 import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SiteFooter from "@/components/SiteFooter";
 import PageLoadingScreen from "@/components/PageLoadingScreen";
@@ -172,7 +171,6 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       {showLoader && <PageLoadingScreen leaving={!preparing} />}
       <div ref={contentRef} className="home-content min-h-screen flex flex-col" style={{ visibility: preparing ? "hidden" : "visible" }} aria-hidden={preparing || undefined} {...(preparing ? { inert: "" } : {})}>
-        <Navbar />
         <HeroBanner onReady={setHeroReady} paused={preparing} />
         {!preparing && <OnboardingTutorial userId={user?.id} activeProfile={activeProfile} />}
 

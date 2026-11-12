@@ -1,6 +1,6 @@
 import { useLayoutEffect, useState, type RefObject } from "react";
 
-interface IndicatorRect { left: number; top: number; width: number; height: number }
+interface IndicatorRect { left: number; top: number; width: number; height: number; opacity: number }
 
 export function useActiveIndicator(ref: RefObject<HTMLDivElement>, selector: string, value?: string) {
   const [rect, setRect] = useState<IndicatorRect | null>(null);
@@ -10,10 +10,10 @@ export function useActiveIndicator(ref: RefObject<HTMLDivElement>, selector: str
     if (!container) return;
     const measure = () => {
       const active = container.querySelector<HTMLElement>(selector);
-      setRect(active ? {
+      setRect((previous) => active ? {
         left: active.offsetLeft, top: active.offsetTop,
-        width: active.offsetWidth, height: active.offsetHeight,
-      } : null);
+        width: active.offsetWidth, height: active.offsetHeight, opacity: 1,
+      } : previous ? { ...previous, opacity: 0 } : null);
     };
     measure();
     const observer = new ResizeObserver(measure);

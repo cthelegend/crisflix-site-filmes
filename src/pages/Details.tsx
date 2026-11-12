@@ -4,7 +4,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, BookmarkPlus, Calendar, Check, Clock3, ExternalLink, Play, SkipForward } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import Navbar from "@/components/Navbar";
 import SiteFooter from "@/components/SiteFooter";
 import { useAuth } from "@/contexts/AuthContext";
 import { buildWatchPath, getContinueWatchingItem } from "@/lib/continueWatching";
@@ -123,7 +122,6 @@ const Details = () => {
   if (!details) {
     return (
       <div className="details-page min-h-screen bg-background">
-        <Navbar />
         <main className="px-4 pb-12 pt-28 md:px-12" aria-busy={!loadError}>
           {loadError ? <div className="py-14"><h1 className="text-xl font-semibold">Não foi possível carregar os detalhes</h1><p className="mt-3 text-sm text-white/55">Tente abrir este título novamente em alguns instantes.</p><Button onClick={() => navigate(-1)} className="mt-6 rounded-full">Voltar</Button></div> : <>
             <p role="status" className="sr-only">Carregando detalhes...</p>
@@ -202,8 +200,7 @@ const Details = () => {
   };
 
   return (
-    <div className="details-page min-h-screen bg-background">
-      <Navbar />
+    <div className="details-page min-h-screen animate-fade-in bg-background">
 
       <section className="details-hero relative min-h-0 overflow-hidden md:min-h-[90svh]">
         <div
