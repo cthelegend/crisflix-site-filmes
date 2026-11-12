@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import { Star } from "lucide-react";
 import { Movie, formatDisplayedRating, getImageUrl } from "@/lib/tmdb";
 
@@ -12,16 +13,24 @@ interface MovieCardProps {
 }
 
 const MovieCard = ({ item, type, href, progress, episodeLabel, actionLabel }: MovieCardProps) => {
+  const [posterReady, setPosterReady] = useState(false);
   const mediaType = type || item.media_type || (item.title ? "movie" : "tv");
   const title = item.title || item.name || "";
   const year = (item.release_date || item.first_air_date || "").slice(0, 4);
   const progressBar = progress !== undefined && <div className="h-1 overflow-hidden rounded-full bg-white/15 md:h-1.5"><div className="h-full rounded-full bg-primary" style={{ width: `${Math.max(0.06, Math.min(1, progress)) * 100}%` }} /></div>;
 
   return (
-    <Link to={href || `/details/${mediaType}/${item.id}`} aria-label={actionLabel || `Ver detalhes de ${title}`}
+    <Link to={href || `/details/${mediaType}/${item.id}`} aria-label={actionLabel || `Ver detalhes de ${title}`} data-poster-ready={posterReady || undefined}
       className="media-card group/card relative block w-[112px] min-w-0 shrink-0 min-[380px]:w-[116px] sm:w-[148px] md:w-[208px]">
       <div className="media-poster relative aspect-[2/3] overflow-hidden rounded-xl border border-white/[0.07] bg-secondary/70 transition-colors group-hover/card:border-white/25 md:rounded-[1.35rem]">
         <img src={getImageUrl(item.poster_path, "w342")}
+          onLoad={(event) => { void event.currentTarget.decode().catch(() => undefined).then(() => setPosterReady(true)); }}
+          onError={(event) => {
+            const image = event.currentTarget;
+            if (image.getAttribute("src") === "/placeholder.svg") { setPosterReady(true); return; }
+            image.removeAttribute("srcset");
+            image.src = "/placeholder.svg";
+          }}
           srcSet={item.poster_path ? `${getImageUrl(item.poster_path, "w185")} 185w, ${getImageUrl(item.poster_path, "w342")} 342w, ${getImageUrl(item.poster_path, "w500")} 500w` : undefined}
           sizes="(min-width: 768px) 208px, (min-width: 640px) 148px, 116px"
           alt={title} className="h-full w-full object-cover transition-[filter] duration-200 group-hover/card:brightness-110" loading="lazy" decoding="async" />

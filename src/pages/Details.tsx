@@ -24,13 +24,13 @@ import { fetchUserMediaState, toggleWatchlist, UserMediaState } from "@/lib/user
 const formatDate = (date?: string) =>
   date
     ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date(`${date}T00:00:00`))
-    : "Nao informado";
+    : "Não informado";
 
 const formatList = (items?: string[]) =>
-  items && items.length > 0 ? items.join(", ") : "Nao informado";
+  items && items.length > 0 ? items.join(", ") : "Não informado";
 
 const formatDuration = (runtime?: number) => {
-  if (!runtime) return "Nao informado";
+  if (!runtime) return "Não informado";
   if (runtime < 60) return `${runtime}min`;
   return `${Math.floor(runtime / 60)}h ${runtime % 60}min`;
 };
@@ -232,9 +232,9 @@ const Details = () => {
 
             <div className="max-w-4xl">
               <div className="mb-3 flex flex-wrap items-center gap-2 text-[9px] uppercase tracking-[0.18em] md:mb-4 md:gap-3 md:text-[11px] md:tracking-[0.35em] text-white/60">
-                <span>{isTV ? "Serie" : "Filme"}</span>
+                <span>{isTV ? "Série" : "Filme"}</span>
                 {year && <span>{year}</span>}
-                <span>{details.status || "Catalogo"}</span>
+                <span>{details.status || "Catálogo"}</span>
               </div>
 
               <h1 className="text-3xl font-bold leading-[1.08] tracking-tight text-white text-shadow sm:text-4xl md:text-7xl">
@@ -337,7 +337,7 @@ const Details = () => {
 
             <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-5 md:mt-8 md:gap-8">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Direcao</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Direção</p>
                 <p className="mt-2 text-base text-white/88">
                   {formatList(isTV ? details.created_by?.map((item) => item.name) : directors)}
                 </p>
@@ -349,15 +349,15 @@ const Details = () => {
                 </p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Titulo original</p>
+                <p className="text-xs uppercase tracking-[0.3em] text-white/42">Título original</p>
                 <p className="mt-2 text-base text-white/88">
-                  {details.original_title || details.original_name || "Nao informado"}
+                  {details.original_title || details.original_name || "Não informado"}
                 </p>
               </div>
               <div>
                 <p className="text-xs uppercase tracking-[0.3em] text-white/42">Idioma original</p>
                 <p className="mt-2 text-base text-white/88">
-                  {details.original_language?.toUpperCase() || "Nao informado"}
+                  {details.original_language?.toUpperCase() || "Não informado"}
                 </p>
               </div>
             </div>
@@ -406,7 +406,7 @@ const Details = () => {
                       <img src={getImageUrl(ep.still_path, "w300")} alt="" className="h-full w-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-xs uppercase tracking-[0.3em] text-white/35">
-                        Episodio
+                        Episódio
                       </div>
                     )}
                   </div>
@@ -415,7 +415,7 @@ const Details = () => {
                     <p className="text-[9px] uppercase tracking-[0.12em] text-white/42 md:text-xs md:tracking-[0.28em]">Episódio {ep.episode_number}</p>
                     <p className="mt-0.5 line-clamp-2 text-xs font-semibold md:line-clamp-none text-white md:mt-1 md:text-base">{ep.name}</p>
                     <p className="mt-1 line-clamp-1 text-[10px] leading-4 md:line-clamp-2 text-white/50 md:mt-2 md:text-sm md:leading-6">
-                      {ep.overview || "Resumo nao informado."}
+                      {ep.overview || "Resumo não informado."}
                     </p>
                   </div>
 

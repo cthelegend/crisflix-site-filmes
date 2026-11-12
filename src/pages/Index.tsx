@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import HeroBanner from "@/components/HeroBanner";
@@ -6,6 +6,8 @@ import MovieRow from "@/components/MovieRow";
 import Navbar from "@/components/Navbar";
 import OnboardingTutorial from "@/components/OnboardingTutorial";
 import SiteFooter from "@/components/SiteFooter";
+import PageLoadingScreen from "@/components/PageLoadingScreen";
+import { useInitialMediaReady } from "@/hooks/use-initial-media-ready";
 import { useAuth } from "@/contexts/AuthContext";
 import { fetchWatchlist, UserMediaState } from "@/lib/userMedia";
 import {
@@ -130,11 +132,15 @@ const Index = () => {
   const { activeProfile, configured, loading, user } = useAuth();
   const [watchlist, setWatchlist] = useState<UserMediaState[]>([]);
   const [homeRows, setHomeRows] = useState<HomeRow[]>([]);
+  const [rowsReady, setRowsReady] = useState(false);
+  const [heroReady, setHeroReady] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const { preparing, showLoader } = useInitialMediaReady(contentRef, rowsReady && heroReady && !loading);
 
   useEffect(() => {
     if (!user || !configured) return;
 
-    fetchWatchlist(user.id).then(setWatchlist);
+    fetchWatchlist(user.id).then(setWatchlist).catch(() => setWatchlist([]));
   }, [configured, user]);
 
   useEffect(() => {
@@ -146,6 +152,9 @@ const Index = () => {
       })
       .catch((error) => {
         console.error("Não foi possível montar o catálogo inicial.", error);
+      })
+      .finally(() => {
+        if (!cancelled) setRowsReady(true);
       });
 
     return () => {
@@ -161,19 +170,22 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navbar />
-      <HeroBanner />
-      <OnboardingTutorial userId={user?.id} activeProfile={activeProfile} />
+      {showLoader && <PageLoadingScreen leaving={!preparing} />}
+      <div ref={contentRef} className="home-content min-h-screen flex flex-col" style={{ visibility: preparing ? "hidden" : "visible" }} aria-hidden={preparing || undefined} {...(preparing ? { inert: "" } : {})}>
+        <Navbar />
+        <HeroBanner onReady={setHeroReady} paused={preparing} />
+        {!preparing && <OnboardingTutorial userId={user?.id} activeProfile={activeProfile} />}
 
-      <main className="-mt-20 relative z-10 pb-16 md:-mt-24">
-        <ContinueWatchingRow />
-        {watchlistItems.length > 0 && <MovieRow title="Minha Lista" items={watchlistItems} />}
-        {homeRows.map((row) => (
-          <MovieRow key={row.title} title={row.title} items={row.items} type={row.type} />
-        ))}
-      </main>
+        <main className="-mt-20 relative z-10 pb-16 md:-mt-24">
+          <ContinueWatchingRow />
+          {watchlistItems.length > 0 && <MovieRow title="Minha Lista" items={watchlistItems} />}
+          {homeRows.map((row) => (
+            <MovieRow key={row.title} title={row.title} items={row.items} type={row.type} />
+          ))}
+        </main>
 
-      <SiteFooter />
+        <SiteFooter />
+      </div>
     </div>
   );
 };

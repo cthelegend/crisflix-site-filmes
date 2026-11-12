@@ -7,31 +7,35 @@ import { Movie, getBackdropUrl, getTrending } from "@/lib/tmdb";
 const HERO_ROTATION_MS = 5500;
 const MAX_SLIDES = 5;
 
-const HeroBanner = () => {
+const HeroBanner = ({ onReady, paused = false }: { onReady?: (ready: boolean) => void; paused?: boolean }) => {
   const [items, setItems] = useState<Movie[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
+    let cancelled = false;
     getTrending().then((data) => {
+      if (cancelled) return;
       const featuredItems = data.results
         .filter((item) => item.backdrop_path && (item.title || item.name))
         .slice(0, MAX_SLIDES);
 
       setItems(featuredItems);
       setActiveIndex(0);
-    }).catch(() => setItems([]));
-  }, []);
+    }).catch(() => { if (!cancelled) setItems([]); })
+      .finally(() => { if (!cancelled) onReady?.(true); });
+    return () => { cancelled = true; };
+  }, [onReady]);
 
   useEffect(() => {
-    if (items.length <= 1) return;
+    if (items.length <= 1 || paused) return;
 
     const interval = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % items.length);
     }, HERO_ROTATION_MS);
 
     return () => window.clearInterval(interval);
-  }, [items.length]);
+  }, [items.length, paused]);
 
   const featured = useMemo(() => items[activeIndex] || null, [activeIndex, items]);
 
@@ -60,6 +64,7 @@ const HeroBanner = () => {
           }`}
         >
           <div
+            data-hero-backdrop={index === activeIndex ? "active" : undefined}
             className="absolute inset-0 scale-[1.03] bg-cover bg-center bg-no-repeat"
             style={{ backgroundImage: `url(${getBackdropUrl(item.backdrop_path)})` }}
           />
