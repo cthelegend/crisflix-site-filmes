@@ -51,7 +51,7 @@ const HeroBanner = () => {
   const type = isMovie ? "movie" : "tv";
 
   return (
-    <section className="hero-banner relative min-h-[88svh] w-full overflow-hidden bg-background md:min-h-[92svh]">
+    <section className="hero-banner relative min-h-[78svh] w-full overflow-hidden bg-background md:min-h-[92svh]">
       {items.map((item, index) => (
         <div
           key={item.id}
@@ -70,36 +70,36 @@ const HeroBanner = () => {
       <div aria-hidden="true" className="hero-red-wash absolute inset-0" />
       <div className="absolute inset-x-0 bottom-0 h-44 gradient-fade-bottom md:h-56" />
 
-      <div className="relative z-10 flex min-h-[88svh] items-end px-4 pb-20 pt-28 md:min-h-[92svh] md:px-12 md:pb-28">
+      <div className="relative z-10 flex min-h-[78svh] items-end px-4 pb-20 pt-28 md:min-h-[92svh] md:px-12 md:pb-28">
         <div className="max-w-2xl">
           <p className="mb-4 text-[11px] uppercase tracking-[0.34em] text-white/65 animate-fade-in md:text-xs md:tracking-[0.42em]">
             {isMovie ? "Filme em destaque" : "Série em destaque"} {year ? `• ${year}` : ""}
           </p>
-          <h1 className="max-w-[12ch] text-4xl font-bold leading-none tracking-tight text-white text-shadow animate-slide-in sm:text-5xl md:max-w-xl md:text-7xl">
+          <h1 className="max-w-[12ch] text-[2rem] font-bold leading-[1.05] tracking-tight text-white text-shadow animate-slide-in sm:text-5xl md:max-w-xl md:text-7xl">
             {title}
           </h1>
-          <p className="mt-4 max-w-xl text-sm leading-6 text-white/78 animate-fade-in md:mt-5 md:text-base md:leading-7">
+          <p className="mt-3 line-clamp-3 max-w-xl text-xs leading-5 md:line-clamp-none text-white/78 animate-fade-in md:mt-5 md:text-base md:leading-7">
             {featured.overview}
           </p>
 
-          <div className="mt-7 flex flex-col gap-3 animate-fade-in sm:flex-row sm:flex-wrap">
+          <div className="hero-actions mt-5 grid grid-cols-2 gap-2 animate-fade-in sm:flex sm:flex-wrap md:mt-7 md:gap-3">
             <Button
               onClick={() => navigate(`/watch/${type}/${featured.id}`)}
-              className="hero-glass-button h-12 rounded-full px-7 text-sm font-semibold"
+              className="hero-button h-11 rounded-full px-3 text-[11px] font-semibold md:h-12 md:px-7 md:text-sm"
             >
               <Play size={18} fill="currentColor" /> Assistir agora
             </Button>
             <Button
               onClick={() => navigate(`/details/${type}/${featured.id}`)}
               variant="secondary"
-              className="hero-glass-button hero-glass-button-secondary h-12 rounded-full px-7 text-sm font-semibold"
+              className="hero-button hero-button-secondary h-11 rounded-full px-3 text-[11px] font-semibold md:h-12 md:px-7 md:text-sm"
             >
               <Info size={18} /> Mais informações
             </Button>
           </div>
 
           {items.length > 1 && (
-            <div className="mt-8 flex items-center gap-2">
+            <div className="mt-4 flex items-center gap-2 md:mt-8">
               {items.map((item, index) => (
                 <button
                   key={`dot-${item.id}`}

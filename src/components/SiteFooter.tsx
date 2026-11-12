@@ -9,7 +9,7 @@ const SiteFooter = () => {
           <Brand />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-white/54 md:justify-end">
+        <div className="footer-links flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-white/54 md:justify-end">
           <Link to="/" className="transition-colors hover:text-white">Início</Link>
           <Link to="/browse/movies" className="transition-colors hover:text-white">Filmes</Link>
           <Link to="/browse/tv" className="transition-colors hover:text-white">Séries</Link>

@@ -23,7 +23,7 @@ const SearchPage = () => {
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="pt-24 px-4 md:px-12 pb-16">
-        <h1 className="text-2xl font-bold text-foreground mb-6">
+        <h1 className="mb-4 break-words text-lg font-bold text-foreground md:mb-6 md:text-2xl">
           Resultados para: <span className="text-muted-foreground">{query}</span>
         </h1>
         {loading ? (
@@ -31,7 +31,7 @@ const SearchPage = () => {
         ) : results.length === 0 ? (
           <p className="text-muted-foreground">Nenhum resultado encontrado.</p>
         ) : (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-3 md:gap-4">
+          <div className="media-grid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 gap-x-2.5 gap-y-4 md:gap-4">
             {results.map((item) => (
               <MovieCard key={item.id} item={item} />
             ))}

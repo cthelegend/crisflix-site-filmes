@@ -141,7 +141,7 @@ const ProfilePage = () => {
           </div>
 
           {editing && (
-            <div className="mx-auto mt-10 max-w-xl rounded-[2rem] border border-white/10 bg-black/60 p-5 backdrop-blur-2xl sm:p-6">
+            <div className="mx-auto mt-10 max-w-xl rounded-[2rem] border border-white/10 bg-black/60 p-5 sm:p-6">
               <div className="mb-5 flex items-center gap-2 text-white">
                 <ImageIcon size={18} />
                 <h2 className="text-xl font-semibold">Editar perfil</h2>

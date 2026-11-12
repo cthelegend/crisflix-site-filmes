@@ -91,12 +91,12 @@ const AuthPage = () => {
       <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url('/login-background.png')", backgroundSize: "cover", backgroundPosition: "center" }} />
 
       <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
-        <section className="w-full max-w-md rounded-[2rem] border border-white/10 bg-black/72 p-5 backdrop-blur-2xl sm:p-7">
+        <section className="w-full max-w-md rounded-3xl border border-white/10 bg-black/72 p-5 sm:rounded-[2rem] sm:p-7">
           <div className="text-center"><Brand centered /></div>
-          <h1 className="mt-6 text-center text-3xl font-bold text-white">
+          <h1 className="mt-5 text-center text-2xl sm:mt-6 sm:text-3xl font-bold text-white">
             {mode === "login" ? "Entrar" : "Criar conta"}
           </h1>
-          <p className="mt-3 text-center text-sm leading-6 text-white/58">
+          <p className="mt-2 text-center text-xs leading-5 sm:mt-3 sm:text-sm sm:leading-6 text-white/58">
             Organize sua lista e continue assistindo com seu perfil.
           </p>
 

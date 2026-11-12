@@ -33,9 +33,9 @@ const MovieRow = ({ title, fetchFn, items: initialItems, type }: MovieRowProps) 
   if (!items.length) return null;
 
   return (
-    <section className="mb-8 px-4 md:mb-10 md:px-12">
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="border-l-[3px] border-primary pl-3 text-lg font-semibold tracking-tight text-foreground md:text-[1.35rem]">{title}</h2>
+    <section className="mb-5 px-4 md:mb-10 md:px-12">
+      <div className="mb-3 flex items-center justify-between md:mb-4">
+        <h2 className="border-l-[3px] border-primary pl-3 text-base font-semibold tracking-tight text-foreground md:text-[1.35rem]">{title}</h2>
       </div>
       <div className="group relative">
         <button
@@ -47,7 +47,7 @@ const MovieRow = ({ title, fetchFn, items: initialItems, type }: MovieRowProps) 
         </button>
         <div
           ref={scrollRef}
-          className="catalog-row row-mask flex gap-3 overflow-x-auto pb-4 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-hidden"
+          className="catalog-row row-mask flex gap-2.5 md:gap-3 overflow-x-auto pb-4 scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:overflow-x-hidden"
         >
           {items.map((item) => (
             <MovieCard key={`${item.media_type || type}-${item.id}`} item={item} type={type} />

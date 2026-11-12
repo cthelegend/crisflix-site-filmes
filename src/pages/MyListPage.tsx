@@ -32,7 +32,7 @@ const GridSection = ({ title, icon, items, emptyText }: { title: string; icon: R
     </div>
 
     {items.length ? (
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="media-grid grid grid-cols-3 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6">
         {items.map((item) => (
           <MovieCard key={`${item.media_type}-${item.id}`} item={item} type={item.media_type as "movie" | "tv"} />
         ))}

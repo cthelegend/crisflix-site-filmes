@@ -19,7 +19,7 @@ const DisclaimerPopup = () => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/72 px-4 backdrop-blur-xl animate-fade-in">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/72 px-4 animate-fade-in">
       <div className="w-full max-w-lg overflow-hidden rounded-[2rem] border border-white/10 bg-[#111111]/95 shadow-[0_30px_120px_rgba(0,0,0,0.5)]">
         <div className="bg-[radial-gradient(circle_at_top_right,rgba(229,9,20,0.2),transparent_34%),linear-gradient(180deg,rgba(255,255,255,0.03),transparent)] p-4 sm:p-5 md:p-8">
           <div className="flex items-start justify-between gap-4">

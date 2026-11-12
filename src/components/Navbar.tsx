@@ -77,8 +77,8 @@ const Navbar = () => {
 
   return (
     <>
-      {searchOpen && <button type="button" onClick={closePanels} aria-label="Fechar painel de navegação" className="fixed inset-0 z-40 bg-black/65 backdrop-blur-sm" />}
-      <header className={`site-header fixed inset-x-0 top-0 z-50 px-4 py-3 transition-colors md:px-8 lg:px-12 ${scrolled || searchOpen ? "bg-background/95 backdrop-blur-2xl" : "bg-gradient-to-b from-black/80 to-transparent"}`}>
+      {searchOpen && <button type="button" onClick={closePanels} aria-label="Fechar painel de navegação" className="fixed inset-0 z-40 bg-black/65" />}
+      <header data-raised={scrolled || searchOpen} className="site-header navbar-glass fixed inset-x-0 top-0 z-50 px-4 py-3 transition-colors md:px-8 lg:px-12">
         <div className="flex items-center justify-between gap-2">
           <Brand onClick={closePanels} />
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
@@ -95,7 +95,7 @@ const Navbar = () => {
           <form id="site-search" role="search" onSubmit={handleSearch} className="mx-auto mt-4 flex max-w-3xl gap-2 pb-1">
             <label htmlFor="catalog-search" className="sr-only">Buscar no catálogo</label>
             <input id="catalog-search" ref={searchInputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Qual filme ou série você procura?" type="search" enterKeyHint="search" className="h-12 min-w-0 flex-1 rounded-full border border-primary/40 bg-black/40 px-3 text-base text-white placeholder:text-white/55" />
-            <button type="submit" className="min-h-12 shrink-0 rounded-full bg-primary px-4 text-sm font-semibold text-white hover:bg-red-700">Buscar</button>
+            <button type="submit" className="navbar-glass-button min-h-12 shrink-0 rounded-full px-4 text-sm font-semibold text-white">Buscar</button>
           </form>
         )}
       </header>
