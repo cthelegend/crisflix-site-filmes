@@ -260,7 +260,7 @@ const Details = () => {
               </p>
               {details.overview?.length > 220 && <button type="button" aria-expanded={overviewExpanded} aria-controls="details-synopsis" onClick={() => setOverviewExpanded((value) => !value)} className="inline-flex min-h-11 items-center text-xs font-medium text-white/80 md:hidden">{overviewExpanded ? "Recolher sinopse" : "Ler sinopse completa"}</button>}
 
-              <div className="details-actions mt-5 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap md:mt-8 md:gap-3">
+              <div className="details-actions mt-5 grid grid-cols-2 gap-2 md:mt-8 md:flex md:flex-wrap md:gap-3">
                 <Button
                   onClick={() => handlePlay(isTV ? selectedSeason : undefined, isTV ? 1 : undefined)}
                   className="h-12 rounded-full border border-white bg-white px-7 text-sm font-semibold text-black transition-colors duration-200 hover:bg-black hover:text-white"
@@ -302,7 +302,7 @@ const Details = () => {
                 <Button
                   onClick={handleToggleWatchlist}
                   variant="secondary"
-                  className="h-12 rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black"
+                  className="col-span-2 h-12 w-[calc(50%_-_0.25rem)] justify-self-center rounded-full border border-white bg-black px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-white hover:text-black md:w-auto"
                 >
                   {savedState?.in_watchlist ? <Check size={18} /> : <BookmarkPlus size={18} />}
                   {savedState?.in_watchlist ? "Na minha lista" : "Minha lista"}
