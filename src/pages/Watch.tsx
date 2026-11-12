@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, RotateCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ContinueWatchingEntry, saveContinueWatching } from "@/lib/continueWatching";
 import { getDubbedPlayerSource } from "@/lib/playerProviders";
@@ -8,6 +8,7 @@ import { saveRemoteContinueWatching } from "@/lib/userMedia";
 import { MovieDetails, Season, getMovieDetails, getTVDetails, getTVSeason } from "@/lib/tmdb";
 
 const SAVE_INTERVAL_MS = 15000;
+const METADATA_TIMEOUT_MS = 8000;
 const positiveInteger = (value: string | null, fallback: number) => {
   const number = Number(value);
   return Number.isFinite(number) && number > 0 ? Math.floor(number) : fallback;
@@ -21,10 +22,13 @@ const Watch = () => {
   const episode = positiveInteger(searchParams.get("e"), 1);
   const numericId = positiveInteger(id || null, 0);
   const isMovie = type === "filme" || type === "movie";
-  const [details, setDetails] = useState<MovieDetails | null>(null);
+  const mediaKey = `${isMovie ? "movie" : "tv"}:${numericId}`;
+  const [metadata, setMetadata] = useState<{ key: string; details: MovieDetails | null; settled: boolean }>({ key: "", details: null, settled: false });
+  const details = metadata.key === mediaKey ? metadata.details : null;
+  const detailsLoading = metadata.key !== mediaKey || !metadata.settled;
   const [currentSeasonData, setCurrentSeasonData] = useState<Season | null>(null);
-  const [detailsLoading, setDetailsLoading] = useState(true);
   const [playerLoaded, setPlayerLoaded] = useState(false);
+  const [reloadIndex, setReloadIndex] = useState(0);
   const progressRef = useRef(initialResumeSeconds);
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -39,15 +43,23 @@ const Watch = () => {
 
   useEffect(() => {
     let cancelled = false;
-    setDetails(null);
-    setDetailsLoading(true);
-    if (!numericId) { setDetailsLoading(false); return; }
+    let settled = false;
+    setMetadata({ key: mediaKey, details: null, settled: false });
+    const finish = (data: MovieDetails | null) => {
+      if (cancelled || settled) return;
+      settled = true;
+      setMetadata({ key: mediaKey, details: data, settled: true });
+    };
+    if (!numericId) { finish(null); return; }
+    // Select the final ID before mounting the iframe. Late metadata must never
+    // replace a player that already started with the TMDB fallback.
+    const timeout = window.setTimeout(() => finish(null), METADATA_TIMEOUT_MS);
     (isMovie ? getMovieDetails(numericId) : getTVDetails(numericId))
-      .then((data) => { if (!cancelled) setDetails(data); })
-      .catch(() => { if (!cancelled) setDetails(null); })
-      .finally(() => { if (!cancelled) setDetailsLoading(false); });
-    return () => { cancelled = true; };
-  }, [isMovie, numericId]);
+      .then(finish)
+      .catch(() => finish(null))
+      .finally(() => window.clearTimeout(timeout));
+    return () => { cancelled = true; window.clearTimeout(timeout); };
+  }, [isMovie, mediaKey, numericId]);
 
   useEffect(() => {
     let cancelled = false;
@@ -75,7 +87,7 @@ const Watch = () => {
   const currentDetails = details?.id === numericId ? details : null;
 
   const iframeSrc = useMemo(() => {
-    if (!numericId) return "";
+    if (!numericId || detailsLoading) return "";
     const source = getDubbedPlayerSource(isMovie ? "movie" : "tv", {
       tmdbId: numericId, imdbId: currentDetails?.external_ids?.imdb_id || currentDetails?.imdb_id,
       season: isMovie ? undefined : season, episode: isMovie ? undefined : episode,
@@ -85,7 +97,7 @@ const Watch = () => {
     url.searchParams.set("t", String(initialResumeSeconds));
     url.hash = `t=${initialResumeSeconds}`;
     return url.href;
-  }, [currentDetails?.external_ids?.imdb_id, currentDetails?.imdb_id, episode, initialResumeSeconds, isMovie, numericId, season]);
+  }, [currentDetails?.external_ids?.imdb_id, currentDetails?.imdb_id, detailsLoading, episode, initialResumeSeconds, isMovie, numericId, season]);
 
   useEffect(() => {
     progressRef.current = initialResumeSeconds;
@@ -138,11 +150,12 @@ const Watch = () => {
         <button type="button" onClick={goBack} className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-full bg-white/10 px-4 text-sm text-white/90 transition-colors hover:bg-white/20">
           <ArrowLeft size={18} /> Voltar
         </button>
-        <p className="truncate text-sm text-white/70">{details?.title || details?.name || "Assistir"}</p>
+        <p className="min-w-0 flex-1 truncate text-sm text-white/70">{details?.title || details?.name || "Assistir"}</p>
+        {iframeSrc && <button type="button" aria-label="Recarregar player" title="Recarregar player" onClick={() => { setPlayerLoaded(false); setReloadIndex((value) => value + 1); }} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20"><RotateCw size={18} /></button>}
       </header>
       <div className="min-h-0 flex-1">
         {iframeSrc ? (
-          <iframe key={iframeSrc} title="Player dublado" tabIndex={0} src={iframeSrc}
+          <iframe key={`${iframeSrc}:${reloadIndex}`} title="Player dublado" tabIndex={0} src={iframeSrc}
             allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
             className="block h-full w-full border-0 bg-black" onLoad={() => setPlayerLoaded(true)} />
         ) : (
