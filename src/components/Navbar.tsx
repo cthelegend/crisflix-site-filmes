@@ -1,7 +1,7 @@
 import type { FormEvent } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Bookmark, Film, Heart, Home, Search, Tv, UserCircle2, X } from "lucide-react";
+import { Bookmark, CircleHelp, Film, Home, Search, Tv, UserCircle2, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Brand from "./Brand";
 import FootballIcon from "./icons/FootballIcon";
@@ -90,7 +90,9 @@ const Navbar = () => {
             <Link to={user ? "/profile" : "/auth"} aria-label={user ? "Meu perfil" : "Entrar"} onClick={closePanels} className="nav-icon">
               {activeProfile?.avatar_url ? <img src={activeProfile.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover" /> : <UserCircle2 size={22} />}
             </Link>
-            <Link to="/donate" aria-label="Apoie o projeto" className="nav-icon hidden lg:inline-flex"><Heart size={20} /></Link>
+            <Link to={user ? "/my-list" : "/quem-somos"} aria-label={user ? "Minha lista" : "Quem somos?"} title={user ? "Minha lista" : "Quem somos?"} onClick={closePanels} className="nav-icon hidden lg:inline-flex">
+              {user ? <Bookmark size={20} /> : <CircleHelp size={20} />}
+            </Link>
           </div>
         </div>
         {searchOpen && (

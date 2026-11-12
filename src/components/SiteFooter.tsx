@@ -11,12 +11,12 @@ const SiteFooter = () => {
 
         <div className="footer-links flex flex-wrap justify-center gap-x-6 gap-y-3 text-sm text-white/54 md:justify-end">
           <Link to="/" className="transition-colors hover:text-white">Início</Link>
+          <Link to="/quem-somos" className="transition-colors hover:text-white">Quem somos?</Link>
           <Link to="/browse/movies" className="transition-colors hover:text-white">Filmes</Link>
           <Link to="/browse/tv" className="transition-colors hover:text-white">Séries</Link>
           <Link to="/futebol" className="transition-colors hover:text-white">Futebol</Link>
-          <Link to="/my-list" className="transition-colors hover:text-white">Minha Lista</Link>
-          <Link to="/profile" className="transition-colors hover:text-white">Perfis</Link>
           <Link to="/donate" className="transition-colors hover:text-white">Doar</Link>
+          <Link to="/my-list" className="transition-colors hover:text-white">Minha lista</Link>
         </div>
       </div>
     </footer>

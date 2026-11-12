@@ -13,6 +13,7 @@ import Football from "./pages/Football";
 import FootballWatch from "./pages/FootballWatch";
 import NotFound from "./pages/NotFound";
 import Donate from "./pages/Donate";
+import About from "./pages/About";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import MyListPage from "./pages/MyListPage";
@@ -40,6 +41,7 @@ const App = () => (
               {/* Retired channel links must not reach the movie/TV player. */}
               <Route path="/watch/channel/*" element={<NotFound />} />
               <Route path="/donate" element={<Donate />} />
+              <Route path="/quem-somos" element={<About />} />
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/my-list" element={<MyListPage />} />
