@@ -13,6 +13,7 @@ const SiteFooter = () => {
           <Link to="/" className="transition-colors hover:text-white">Início</Link>
           <Link to="/browse/movies" className="transition-colors hover:text-white">Filmes</Link>
           <Link to="/browse/tv" className="transition-colors hover:text-white">Séries</Link>
+          <Link to="/futebol" className="transition-colors hover:text-white">Futebol</Link>
           <Link to="/my-list" className="transition-colors hover:text-white">Minha Lista</Link>
           <Link to="/profile" className="transition-colors hover:text-white">Perfis</Link>
           <Link to="/donate" className="transition-colors hover:text-white">Doar</Link>

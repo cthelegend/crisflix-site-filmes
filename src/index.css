@@ -300,7 +300,7 @@
 }
 @media (max-width: 767px) {
   .navigation-dock { bottom: calc(23px + env(safe-area-inset-bottom)); }
-  .glass-tab-bar-item { width: clamp(62px, 19.5vw, 78px); min-height: 52px; gap: 3px; font-size: 9px; }
+  .glass-tab-bar-item { width: clamp(52px, 17.5vw, 78px); min-height: 52px; gap: 3px; font-size: 9px; }
   .glass-tab-bar-item svg { width: 20px; height: 20px; }
   .liquid-glass { backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); }
   .catalog-row { gap: 10px; overscroll-behavior-x: contain; }

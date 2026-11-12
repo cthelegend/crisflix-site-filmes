@@ -4,6 +4,18 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
+      "source": "/api/futebol/events",
+      "destination": "https://embedtv.cc/api/events"
+    },
+    {
+      "source": "/api/futebol/channels",
+      "destination": "https://embedtv.cc/api/channels"
+    },
+    {
+      "source": "/api/futebol/epg_all",
+      "destination": "https://embedtv.cc/api/epg_all"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

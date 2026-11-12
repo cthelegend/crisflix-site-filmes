@@ -7,6 +7,13 @@ export default defineConfig({
   server: {
     host: "::",
     port: 8080,
+    proxy: {
+      "/api/futebol": {
+        target: "https://embedtv.cc",
+        changeOrigin: true,
+        rewrite: (requestPath) => requestPath.replace(/^\/api\/futebol/, "/api"),
+      },
+    },
     hmr: {
       overlay: false,
     },

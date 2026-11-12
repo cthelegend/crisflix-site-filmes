@@ -9,6 +9,8 @@ import Details from "./pages/Details";
 import Watch from "./pages/Watch";
 import SearchPage from "./pages/SearchPage";
 import Browse from "./pages/Browse";
+import Football from "./pages/Football";
+import FootballWatch from "./pages/FootballWatch";
 import NotFound from "./pages/NotFound";
 import Donate from "./pages/Donate";
 import AuthPage from "./pages/AuthPage";
@@ -33,6 +35,8 @@ const App = () => (
               <Route path="/watch/:type/:id" element={<Watch />} />
               <Route path="/search" element={<SearchPage />} />
               <Route path="/browse/:category" element={<Browse />} />
+              <Route path="/futebol" element={<Football />} />
+              <Route path="/futebol/:slug" element={<FootballWatch />} />
               {/* Retired channel links must not reach the movie/TV player. */}
               <Route path="/watch/channel/*" element={<NotFound />} />
               <Route path="/donate" element={<Donate />} />

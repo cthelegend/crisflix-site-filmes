@@ -4,12 +4,14 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Bookmark, Film, Heart, Home, Search, Tv, UserCircle2, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Brand from "./Brand";
+import FootballIcon from "./icons/FootballIcon";
 import { GlassTabBar, GlassTabBarItem } from "./ui/glass-tab-bar";
 
 const destinations = [
   { to: "/", label: "Início", icon: Home },
   { to: "/browse/movies", label: "Filmes", icon: Film },
   { to: "/browse/tv", label: "Séries", icon: Tv },
+  { to: "/futebol", label: "Futebol", icon: FootballIcon },
   { to: "/my-list", label: "Minha lista", icon: Bookmark },
 ];
 
