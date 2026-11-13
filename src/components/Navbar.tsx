@@ -7,12 +7,18 @@ import Brand from "./Brand";
 import FootballIcon from "./icons/FootballIcon";
 import { GlassTabBar, GlassTabBarItem } from "./ui/glass-tab-bar";
 
+const LibraryIcon = ({ size = 36 }: { size?: number }) => (
+  <span className="library-tab-disc" data-independent-indicator>
+    <img src="/hammer-sickle.png" width={size} height={size} alt="" aria-hidden="true" />
+  </span>
+);
+
 const destinations = [
   { to: "/", label: "Início", icon: Home },
   { to: "/browse/movies", label: "Filmes", icon: Film },
+  { to: "/biblioteca", label: "Biblioteca da Esquerda", icon: LibraryIcon },
   { to: "/browse/tv", label: "Séries", icon: Tv },
   { to: "/futebol", label: "Futebol", icon: FootballIcon },
-  { to: "/my-list", label: "Minha lista", icon: Bookmark },
 ];
 
 const Navbar = () => {
@@ -86,7 +92,7 @@ const Navbar = () => {
             <Link to={user ? "/profile" : "/auth"} aria-label={user ? "Meu perfil" : "Entrar"} onClick={closePanels} className="nav-icon">
               {activeProfile?.avatar_url ? <img src={activeProfile.avatar_url} alt="" className="h-6 w-6 rounded-full object-cover" /> : <UserCircle2 size={22} />}
             </Link>
-            <Link to={user ? "/my-list" : "/quem-somos"} aria-label={user ? "Minha lista" : "Quem somos?"} title={user ? "Minha lista" : "Quem somos?"} onClick={closePanels} className="nav-icon hidden lg:inline-flex">
+            <Link to={user ? "/my-list" : "/quem-somos"} aria-label={user ? "Minha lista" : "Quem somos?"} title={user ? "Minha lista" : "Quem somos?"} onClick={closePanels} className={`nav-icon ${user ? "nav-watchlist" : "hidden lg:inline-flex"}`}>
               {user ? <Bookmark size={20} /> : <CircleHelp size={20} />}
             </Link>
           </div>
@@ -101,7 +107,7 @@ const Navbar = () => {
       </header>
       <GlassTabBar aria-label="Navegação principal" value={location.pathname} className="navigation-dock">
         {destinations.map(({ to, label, icon: Icon }) => (
-          <GlassTabBarItem key={to} to={to} value={to} label={label} icon={<Icon size={23} />} onClick={closePanels} />
+          <GlassTabBarItem key={to} to={to} value={to} label={label} icon={<Icon size={to === "/biblioteca" ? 36 : 23} />} iconOnly={to === "/biblioteca"} className={to === "/biblioteca" ? "library-tab" : undefined} onClick={closePanels} />
         ))}
       </GlassTabBar>
     </>

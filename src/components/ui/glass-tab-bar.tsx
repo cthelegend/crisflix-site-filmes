@@ -24,14 +24,15 @@ function GlassTabBar({ className, children, value, ...props }: ComponentProps<"n
   );
 }
 
-function GlassTabBarItem({ className, value, icon, label, ...props }: Omit<ComponentProps<typeof Link>, "children"> & {
-  value: string; icon: ReactNode; label: string;
+function GlassTabBarItem({ className, value, icon, label, iconOnly = false, ...props }: Omit<ComponentProps<typeof Link>, "children"> & {
+  value: string; icon: ReactNode; label: string; iconOnly?: boolean;
 }) {
   const current = useContext(TabBarContext);
   return (
     <Link data-slot="glass-tab-bar-item" aria-current={current === value ? "page" : undefined}
+      aria-label={iconOnly ? label : undefined}
       className={cn("glass-tab-bar-item", className)} {...props}>
-      {icon}<span>{label}</span>
+      {icon}{!iconOnly && <span>{label}</span>}
     </Link>
   );
 }

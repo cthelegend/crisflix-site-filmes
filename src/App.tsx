@@ -14,6 +14,7 @@ import FootballWatch from "./pages/FootballWatch";
 import NotFound from "./pages/NotFound";
 import Donate from "./pages/Donate";
 import About from "./pages/About";
+import LeftLibrary from "./pages/LeftLibrary";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
 import MyListPage from "./pages/MyListPage";
@@ -40,6 +41,7 @@ const App = () => (
             <Route path="/watch/channel/*" element={<NotFound />} />
             <Route path="/donate" element={<Donate />} />
             <Route path="/quem-somos" element={<About />} />
+            <Route path="/biblioteca" element={<LeftLibrary />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/my-list" element={<MyListPage />} />

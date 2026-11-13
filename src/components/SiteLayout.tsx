@@ -7,7 +7,7 @@ import Navbar from "./Navbar";
 const NavigationContext = createContext(false);
 export const useHasNavigated = () => useContext(NavigationContext);
 
-const navbarPaths = ["/", "/browse/:category", "/details/:type/:id", "/search", "/my-list", "/donate", "/quem-somos", "/futebol"];
+const navbarPaths = ["/", "/browse/:category", "/details/:type/:id", "/search", "/my-list", "/donate", "/quem-somos", "/futebol", "/biblioteca"];
 
 function RoutePage({ children, location, reducedMotion }: { children: ReactNode; location: Location; reducedMotion: boolean }) {
   const present = useIsPresent();

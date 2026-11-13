@@ -10,9 +10,10 @@ export function useActiveIndicator(ref: RefObject<HTMLDivElement>, selector: str
     if (!container) return;
     const measure = () => {
       const active = container.querySelector<HTMLElement>(selector);
+      const independent = active?.querySelector("[data-independent-indicator]");
       setRect((previous) => active ? {
         left: active.offsetLeft, top: active.offsetTop,
-        width: active.offsetWidth, height: active.offsetHeight, opacity: 1,
+        width: active.offsetWidth, height: active.offsetHeight, opacity: independent ? 0 : 1,
       } : previous ? { ...previous, opacity: 0 } : null);
     };
     measure();
