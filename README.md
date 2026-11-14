@@ -49,16 +49,9 @@ Arquivos locais de ambiente são ignorados pelo Git.
   Revogue e substitua a credencial antiga que já esteve no código público.
 - `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`: configuração pública do cliente.
   Use apenas a chave anon/publishable; nunca `service_role` ou `sb_secret_*`.
-- As URLs dos players aceitam HTTPS dos domínios conhecidos SuperFlix
-  (`superflixapi.rest`, `.monster`, `.fun` e `.boats`); os domínios antigos são
-  direcionados ao destino atual `.boats`. As transmissões de
-  futebol aceitam `embedtv.cc` e seus subdomínios. Para trocar de provedor, atualize
-  a lista de origens permitidas e a CSP em `vercel.json` de forma coordenada.
-
-O player externo pode exigir verificação própria do navegador. Se essa página
-for recusada dentro do iframe pelo provedor, o botão **Abrir player** permite
-acessá-la em outra aba. O site não remove proteções do provedor nem garante que
-uma transmissão externa estará disponível.
+- Os players de filmes e séries usam os endereços e parâmetros configurados,
+  sem reescrever o domínio. A incorporação segue a integração original,
+  sem sandbox nesses players. A integração de futebol permanece inalterada.
 
 O catálogo e o futebol usam funções em `api/`. Publique o projeto completo na
 Vercel: servir apenas `dist/` sem essas funções não fornece as APIs. O servidor

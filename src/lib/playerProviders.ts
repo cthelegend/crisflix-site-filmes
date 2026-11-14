@@ -1,4 +1,4 @@
-import { CURRENT_MOVIE_PLAYER_HOST, MOVIE_PLAYER_HOSTS, safePlayerUrl } from "@/lib/security";
+import { MOVIE_PLAYER_HOSTS, safePlayerUrl } from "@/lib/security";
 export type PlayerMediaType = "movie" | "tv";
 
 interface ProviderContext {
@@ -36,11 +36,7 @@ export function getDubbedPlayerSource(type: PlayerMediaType, context: ProviderCo
     if (complete) {
       const safe = safePlayerUrl(source, MOVIE_PLAYER_HOSTS);
       if (safe) {
-        const url = new URL(safe);
-        // Older configured domains currently chain through three redirects.
-        // Use the verified destination directly to avoid CSP/network failures.
-        if (MOVIE_PLAYER_HOSTS.includes(url.hostname)) url.hostname = CURRENT_MOVIE_PLAYER_HOST;
-        return url.href;
+        return safe;
       }
     }
   }

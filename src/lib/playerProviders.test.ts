@@ -8,18 +8,18 @@ afterEach(() => vi.unstubAllEnvs());
 
 it("keeps the default dubbed movie provider without build-time configuration", async () => {
   const { getDubbedPlayerSource } = await import("./playerProviders");
-  expect(getDubbedPlayerSource("movie", { tmdbId: 550, imdbId: "tt0137523" })).toBe("https://superflixapi.boats/filme/tt0137523");
-  expect(getDubbedPlayerSource("movie", { tmdbId: 550 })).toBe("https://superflixapi.boats/filme/550");
+  expect(getDubbedPlayerSource("movie", { tmdbId: 550, imdbId: "tt0137523" })).toBe("https://superflixapi.rest/filme/tt0137523");
+  expect(getDubbedPlayerSource("movie", { tmdbId: 550 })).toBe("https://superflixapi.rest/filme/550");
 });
 it("keeps TV and episode defaults without build-time configuration", async () => {
   const { getDubbedPlayerSource } = await import("./playerProviders");
-  expect(getDubbedPlayerSource("tv", { tmdbId: 1489 })).toBe("https://superflixapi.boats/serie/1489");
-  expect(getDubbedPlayerSource("tv", { tmdbId: 1489, season: 2, episode: 3 })).toBe("https://superflixapi.boats/serie/1489/2/3");
+  expect(getDubbedPlayerSource("tv", { tmdbId: 1489 })).toBe("https://superflixapi.rest/serie/1489");
+  expect(getDubbedPlayerSource("tv", { tmdbId: 1489, season: 2, episode: 3 })).toBe("https://superflixapi.rest/serie/1489/2/3");
 });
-it.each(["rest", "monster", "fun", "boats"])("uses the verified destination for the configured .%s provider", async (suffix) => {
+it.each(["rest", "monster", "fun", "boats"])("preserves the configured .%s provider without rewriting its domain", async (suffix) => {
   vi.stubEnv("VITE_PLAYER_DUBBED_MOVIE_TEMPLATE", `https://superflixapi.${suffix}/filme/{tmdbId}`);
   const { getDubbedPlayerSource } = await import("./playerProviders");
-  expect(getDubbedPlayerSource("movie", { tmdbId: 550 })).toBe("https://superflixapi.boats/filme/550");
+  expect(getDubbedPlayerSource("movie", { tmdbId: 550 })).toBe(`https://superflixapi.${suffix}/filme/550`);
 });
 it.each(["javascript:alert(1)", "https://superflixapi.rest.evil.test/{tmdbId}", "http://superflixapi.rest/filme/{tmdbId}"])("rejects unsafe configured template %s", async (value) => {
   vi.stubEnv("VITE_PLAYER_DUBBED_MOVIE_TEMPLATE", value);
