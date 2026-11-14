@@ -18,7 +18,7 @@ import {
   getTVDetails,
   getTVSeason,
 } from "@/lib/tmdb";
-import { fetchUserMediaState, toggleWatchlist, UserMediaState } from "@/lib/userMedia";
+import { fetchUserMediaState, mapRowToContinueWatching, toggleWatchlist, UserMediaState } from "@/lib/userMedia";
 
 const formatDate = (date?: string) =>
   date
@@ -41,12 +41,10 @@ const Details = () => {
   const [overviewExpanded, setOverviewExpanded] = useState(false);
   const [selectedSeason, setSelectedSeason] = useState(1);
   const [season, setSeason] = useState<Season | null>(null);
-  const [resumeItem, setResumeItem] = useState(() =>
-    getContinueWatchingItem((type as "movie" | "tv") || "movie", Number(id)),
-  );
+  const [resumeItem, setResumeItem] = useState<ReturnType<typeof getContinueWatchingItem>>(null);
   const [savedState, setSavedState] = useState<UserMediaState | null>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, activeProfile } = useAuth();
 
   const numId = Number(id);
   const isTV = type === "tv";
@@ -67,7 +65,6 @@ const Details = () => {
       } catch { if (!cancelled) setLoadError(true); }
     };
     void loadDetails();
-    setResumeItem(getContinueWatchingItem(isTV ? "tv" : "movie", numId));
     return () => { cancelled = true; };
   }, [isTV, numId]);
 
@@ -78,21 +75,29 @@ const Details = () => {
   }, [details, isTV, numId, selectedSeason]);
 
   useEffect(() => {
-    const syncResume = () => setResumeItem(getContinueWatchingItem(isTV ? "tv" : "movie", numId));
+    const syncResume = () => setResumeItem(user ? null : getContinueWatchingItem(isTV ? "tv" : "movie", numId));
+    syncResume();
     window.addEventListener("continue-watching-updated", syncResume);
     return () => window.removeEventListener("continue-watching-updated", syncResume);
-  }, [isTV, numId]);
+  }, [isTV, numId, user?.id, activeProfile?.id]);
 
   useEffect(() => {
-    if (!user || !numId) {
+    if (!user || !activeProfile || !numId) {
       setSavedState(null);
       return;
     }
 
-    fetchUserMediaState(user.id, isTV ? "tv" : "movie", numId)
-      .then(setSavedState)
-      .catch(() => setSavedState(null));
-  }, [isTV, numId, user]);
+    let cancelled = false;
+    setSavedState(null);
+    fetchUserMediaState({ userId: user.id, profileId: activeProfile.id }, isTV ? "tv" : "movie", numId)
+      .then((state) => {
+        if (cancelled) return;
+        setSavedState(state);
+        setResumeItem(state?.progress_seconds ? mapRowToContinueWatching(state) : null);
+      })
+      .catch(() => { if (!cancelled) { setSavedState(null); setResumeItem(null); } });
+    return () => { cancelled = true; };
+  }, [isTV, numId, user?.id, activeProfile?.id]);
 
   const title = details?.title || details?.name || "";
   const year = (details?.release_date || details?.first_air_date || "").slice(0, 4);
@@ -188,10 +193,11 @@ const Details = () => {
       navigate("/auth");
       return;
     }
+    if (!activeProfile) { navigate("/profile"); return; }
 
     try {
       const nextValue = !savedState?.in_watchlist;
-      const next = await toggleWatchlist(user.id, mediaIdentity, nextValue);
+      const next = await toggleWatchlist({ userId: user.id, profileId: activeProfile.id }, mediaIdentity, nextValue);
       setSavedState(next);
       toast.success(nextValue ? "Adicionado à sua lista." : "Removido da sua lista.");
     } catch (error) {

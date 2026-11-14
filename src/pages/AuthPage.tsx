@@ -16,7 +16,7 @@ function getAuthErrorMessage(error: unknown) {
   }
 
   if (message.includes("already registered") || message.includes("already been registered")) {
-    return "Este e-mail já está cadastrado. Use o login para entrar.";
+    return "Confira seu e-mail ou tente entrar com sua conta.";
   }
 
   if (message.includes("invalid login credentials")) {
@@ -27,7 +27,7 @@ function getAuthErrorMessage(error: unknown) {
     return "Confirme seu e-mail antes de entrar.";
   }
 
-  return error.message || "Não foi possível continuar.";
+  return "Não foi possível continuar. Confira os dados e tente novamente.";
 }
 
 const AuthPage = () => {
@@ -66,6 +66,7 @@ const AuthPage = () => {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
+    if (submitting) return;
     setSubmitting(true);
 
     try {
@@ -74,7 +75,7 @@ const AuthPage = () => {
         toast.success("Login realizado com sucesso.");
       } else {
         await signUp(email, password, displayName.trim());
-        toast.success("Conta criada com sucesso.");
+        toast.success("Confira seu e-mail para continuar o cadastro, se necessário.");
       }
 
       navigate("/profile");
@@ -127,6 +128,7 @@ const AuthPage = () => {
                 <label className="mb-2 block text-sm text-white/70">Nome do perfil</label>
                 <Input
                   ref={nameInputRef}
+                  maxLength={80}
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   onKeyDown={(e) => focusOnEnter(e, emailInputRef.current)}
@@ -141,6 +143,8 @@ const AuthPage = () => {
               <Input
                 ref={emailInputRef}
                 type="email"
+                maxLength={254}
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => focusOnEnter(e, passwordInputRef.current)}
@@ -154,10 +158,12 @@ const AuthPage = () => {
               <Input
                 ref={passwordInputRef}
                 type="password"
+                autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={mode === "signup" ? 12 : 1}
+                maxLength={128}
                 className="h-12 rounded-2xl border-white/10 bg-white/[0.04] text-white"
               />
             </div>

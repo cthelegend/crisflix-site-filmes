@@ -2,9 +2,14 @@ import { ContinueWatchingEntry } from "@/lib/continueWatching";
 import { supabase } from "@/lib/supabase";
 
 type MediaType = "movie" | "tv";
+export interface MediaScope { userId: string; profileId: string }
+function requireScope(scope: MediaScope) {
+  if (!scope?.userId || !scope.profileId) throw new Error("Selecione um perfil para continuar.");
+}
 
 export interface UserMediaState {
   user_id: string;
+  profile_id: string;
   media_type: MediaType;
   media_id: number;
   title: string;
@@ -33,7 +38,7 @@ export interface MediaIdentity {
   first_air_date?: string | null;
 }
 
-function mapRowToContinueWatching(row: UserMediaState): ContinueWatchingEntry {
+export function mapRowToContinueWatching(row: UserMediaState): ContinueWatchingEntry {
   return {
     id: row.media_id,
     type: row.media_type,
@@ -52,9 +57,10 @@ function mapRowToContinueWatching(row: UserMediaState): ContinueWatchingEntry {
   };
 }
 
-function basePayload(userId: string, media: MediaIdentity) {
+function basePayload(scope: MediaScope, media: MediaIdentity) {
   return {
-    user_id: userId,
+    user_id: scope.userId,
+    profile_id: scope.profileId,
     media_type: media.media_type,
     media_id: media.media_id,
     title: media.title,
@@ -66,13 +72,15 @@ function basePayload(userId: string, media: MediaIdentity) {
   };
 }
 
-export async function fetchUserMediaState(userId: string, mediaType: MediaType, mediaId: number) {
+export async function fetchUserMediaState(scope: MediaScope, mediaType: MediaType, mediaId: number) {
+  requireScope(scope);
   if (!supabase) return null;
 
   const { data, error } = await supabase
     .from("user_media_state")
     .select("*")
-    .eq("user_id", userId)
+    .eq("user_id", scope.userId)
+    .eq("profile_id", scope.profileId)
     .eq("media_type", mediaType)
     .eq("media_id", mediaId)
     .maybeSingle<UserMediaState>();
@@ -82,20 +90,21 @@ export async function fetchUserMediaState(userId: string, mediaType: MediaType, 
 }
 
 export async function upsertUserMediaState(
-  userId: string,
+  scope: MediaScope,
   media: MediaIdentity,
-  patch: Partial<Omit<UserMediaState, keyof MediaIdentity | "user_id" | "media_id" | "media_type">>,
+  patch: Partial<Omit<UserMediaState, keyof MediaIdentity | "user_id" | "profile_id" | "media_id" | "media_type">>,
 ) {
+  requireScope(scope);
   if (!supabase) return null;
 
   const payload = {
-    ...basePayload(userId, media),
     ...patch,
+    ...basePayload(scope, media),
   };
 
   const { data, error } = await supabase
     .from("user_media_state")
-    .upsert(payload, { onConflict: "user_id,media_type,media_id" })
+    .upsert(payload, { onConflict: "user_id,profile_id,media_type,media_id" })
     .select("*")
     .single<UserMediaState>();
 
@@ -103,13 +112,13 @@ export async function upsertUserMediaState(
   return data;
 }
 
-export async function toggleWatchlist(userId: string, media: MediaIdentity, nextValue: boolean) {
-  return upsertUserMediaState(userId, media, { in_watchlist: nextValue });
+export async function toggleWatchlist(scope: MediaScope, media: MediaIdentity, nextValue: boolean) {
+  return upsertUserMediaState(scope, media, { in_watchlist: nextValue });
 }
 
-export async function saveRemoteContinueWatching(userId: string, entry: ContinueWatchingEntry) {
-  return upsertUserMediaState(
-    userId,
+export async function saveRemoteContinueWatching(scope: MediaScope, entry: ContinueWatchingEntry) {
+  const saved = await upsertUserMediaState(
+    scope,
     {
       media_type: entry.type,
       media_id: entry.id,
@@ -128,30 +137,37 @@ export async function saveRemoteContinueWatching(userId: string, entry: Continue
       next_episode: entry.nextEpisode || null,
     },
   );
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("continue-watching-updated"));
+  return saved;
 }
 
-export async function fetchRemoteContinueWatching(userId: string) {
+export async function fetchRemoteContinueWatching(scope: MediaScope) {
+  requireScope(scope);
   if (!supabase) return [];
 
   const { data, error } = await supabase
     .from("user_media_state")
     .select("*")
-    .eq("user_id", userId)
+    .eq("user_id", scope.userId)
+    .eq("profile_id", scope.profileId)
     .gt("progress_seconds", 0)
     .order("updated_at", { ascending: false })
+    .limit(100)
     .returns<UserMediaState[]>();
 
   if (error) throw error;
   return (data || []).map(mapRowToContinueWatching);
 }
 
-export async function fetchWatchlist(userId: string) {
+export async function fetchWatchlist(scope: MediaScope) {
+  requireScope(scope);
   if (!supabase) return [];
 
   const { data, error } = await supabase
     .from("user_media_state")
     .select("*")
-    .eq("user_id", userId)
+    .eq("user_id", scope.userId)
+    .eq("profile_id", scope.profileId)
     .eq("in_watchlist", true)
     .order("updated_at", { ascending: false })
     .returns<UserMediaState[]>();

@@ -1,3 +1,4 @@
+import { safePlayerUrl } from "@/lib/security";
 export type PlayerMediaType = "movie" | "tv";
 
 interface ProviderContext {
@@ -11,9 +12,10 @@ function parseTemplates(value?: string) {
   return (value || "").split(/\r?\n|\|\|/).map((item) => item.trim()).filter(Boolean);
 }
 
-const movieTemplates = parseTemplates(import.meta.env.VITE_PLAYER_DUBBED_MOVIE_TEMPLATE);
-const tvTemplates = parseTemplates(import.meta.env.VITE_PLAYER_DUBBED_TV_TEMPLATE);
-const episodeTemplates = parseTemplates(import.meta.env.VITE_PLAYER_DUBBED_TV_EPISODE_TEMPLATE);
+// Public defaults keep playback configured after removing the versioned .env.
+const movieTemplates = parseTemplates(import.meta.env.VITE_PLAYER_DUBBED_MOVIE_TEMPLATE || "https://superflixapi.rest/filme/{imdbId}||https://superflixapi.rest/filme/{tmdbId}");
+const tvTemplates = parseTemplates(import.meta.env.VITE_PLAYER_DUBBED_TV_TEMPLATE || "https://superflixapi.rest/serie/{tmdbId}||https://superflixapi.rest/serie/{imdbId}");
+const episodeTemplates = parseTemplates(import.meta.env.VITE_PLAYER_DUBBED_TV_EPISODE_TEMPLATE || "https://superflixapi.rest/serie/{tmdbId}/{season}/{episode}||https://superflixapi.rest/serie/{imdbId}/{season}/{episode}");
 const tokens: Record<string, keyof ProviderContext> = {
   "{tmdbId}": "tmdbId", "{imdbId}": "imdbId", "{season}": "season", "{episode}": "episode",
 };
@@ -31,7 +33,7 @@ export function getDubbedPlayerSource(type: PlayerMediaType, context: ProviderCo
       if (value === undefined || value === null || value === "") { complete = false; break; }
       source = source.split(token).join(encodeURIComponent(String(value)));
     }
-    if (complete) return source;
+    if (complete) { const safe = safePlayerUrl(source, ["superflixapi.rest"]); if (safe) return safe; }
   }
   return null;
 }

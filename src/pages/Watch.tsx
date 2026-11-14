@@ -1,3 +1,4 @@
+import { PLAYER_SANDBOX } from "@/lib/security";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, RotateCw } from "lucide-react";
@@ -11,7 +12,7 @@ const SAVE_INTERVAL_MS = 15000;
 const METADATA_TIMEOUT_MS = 8000;
 const positiveInteger = (value: string | null, fallback: number) => {
   const number = Number(value);
-  return Number.isFinite(number) && number > 0 ? Math.floor(number) : fallback;
+  return Number.isSafeInteger(number) && number > 0 && number <= 1000000000 ? Math.floor(number) : fallback;
 };
 
 const Watch = () => {
@@ -20,7 +21,7 @@ const Watch = () => {
   const initialResumeSeconds = positiveInteger(searchParams.get("t"), 0);
   const season = positiveInteger(searchParams.get("s"), 1);
   const episode = positiveInteger(searchParams.get("e"), 1);
-  const numericId = positiveInteger(id || null, 0);
+  const numericId = ["filme", "movie", "tv", "serie"].includes(type || "") ? positiveInteger(id || null, 0) : 0;
   const isMovie = type === "filme" || type === "movie";
   const mediaKey = `${isMovie ? "movie" : "tv"}:${numericId}`;
   const [metadata, setMetadata] = useState<{ key: string; details: MovieDetails | null; settled: boolean }>({ key: "", details: null, settled: false });
@@ -31,7 +32,7 @@ const Watch = () => {
   const [reloadIndex, setReloadIndex] = useState(0);
   const progressRef = useRef(initialResumeSeconds);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, activeProfile } = useAuth();
 
   useEffect(() => {
     // Old links with audio=subbed now open the sole dubbed player as well.
@@ -124,8 +125,8 @@ const Watch = () => {
         progressSeconds: syncProgress(), runtimeSeconds: runtimeMinutes ? runtimeMinutes * 60 : undefined,
         nextEpisode, updatedAt: Date.now(),
       };
-      saveContinueWatching(entry);
-      if (user) void saveRemoteContinueWatching(user.id, entry).catch(() => undefined);
+      if (!user) saveContinueWatching(entry);
+      if (user && activeProfile) void saveRemoteContinueWatching({ userId: user.id, profileId: activeProfile.id }, entry).catch(() => undefined);
     };
     const onVisibility = () => { persist(); visible = !document.hidden; };
     const interval = window.setInterval(persist, SAVE_INTERVAL_MS);
@@ -137,7 +138,7 @@ const Watch = () => {
       window.removeEventListener("beforeunload", persist);
       persist();
     };
-  }, [details, episode, iframeSrc, isMovie, nextEpisode, numericId, playerLoaded, runtimeMinutes, season, user]);
+  }, [details, episode, iframeSrc, isMovie, nextEpisode, numericId, playerLoaded, runtimeMinutes, season, user?.id, activeProfile?.id]);
 
   const goBack = () => {
     if ((window.history.state?.idx ?? 0) > 0) navigate(-1);
@@ -156,7 +157,7 @@ const Watch = () => {
       <div className="min-h-0 flex-1">
         {iframeSrc ? (
           <iframe key={`${iframeSrc}:${reloadIndex}`} title="Player dublado" tabIndex={0} src={iframeSrc}
-            allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
+            sandbox={PLAYER_SANDBOX} referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
             className="block h-full w-full border-0 bg-black" onLoad={() => setPlayerLoaded(true)} />
         ) : (
           <div className="flex h-full items-center justify-center px-6 text-center text-white">

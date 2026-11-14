@@ -1,225 +1,71 @@
-import Brand from "@/components/Brand";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { Camera, ImageIcon, UserCircle2 } from "lucide-react";
+import { useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { ArrowLeft, Check, LogOut, Pencil, Plus, RefreshCw, UserCircle2 } from "lucide-react";
 import { toast } from "sonner";
+import Brand from "@/components/Brand";
+import ProfileEditor from "@/components/ProfileEditor";
+import { useAuth, UserProfile } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useAuth } from "@/contexts/AuthContext";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
-function createAvatarPreset(from: string, to: string, accent: string) {
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
-      <defs>
-        <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${from}"/>
-          <stop offset="100%" stop-color="${to}"/>
-        </linearGradient>
-      </defs>
-      <rect width="320" height="320" rx="52" fill="url(#bg)"/>
-      <circle cx="160" cy="126" r="58" fill="#fff" opacity="0.92"/>
-      <path d="M73 269c18-61 58-94 87-94s69 33 87 94" fill="#fff" opacity="0.92"/>
-      <circle cx="125" cy="119" r="10" fill="${accent}"/>
-      <circle cx="195" cy="119" r="10" fill="${accent}"/>
-      <path d="M129 153c18 14 44 14 62 0" fill="none" stroke="${accent}" stroke-width="10" stroke-linecap="round"/>
-    </svg>
-  `;
-
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
-const AVATAR_PRESETS = [
-  createAvatarPreset("#e50914", "#671016", "#111111"),
-  createAvatarPreset("#0f766e", "#042f2e", "#111827"),
-  createAvatarPreset("#2563eb", "#111827", "#1e3a8a"),
-  createAvatarPreset("#f59e0b", "#7c2d12", "#431407"),
-  createAvatarPreset("#9333ea", "#111827", "#581c87"),
-  createAvatarPreset("#16a34a", "#052e16", "#14532d"),
-];
-
-const ProfilePage = () => {
-  const { loading, profile, selectProfile, updateProfile, uploadAvatar, user } = useAuth();
+export default function ProfilePage() {
+  const { loading, profiles, profilesError, activeProfile, selectProfile, refreshProfile, signOut, user } = useAuth();
   const navigate = useNavigate();
-  const [manageMode, setManageMode] = useState(false);
-  const [editing, setEditing] = useState(false);
-  const [displayName, setDisplayName] = useState(profile?.display_name || "");
-  const [avatarUrl, setAvatarUrl] = useState(profile?.avatar_url || "");
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-
-  useEffect(() => {
-    setDisplayName(profile?.display_name || "");
-    setAvatarUrl(profile?.avatar_url || "");
-  }, [profile?.avatar_url, profile?.display_name]);
-
-  if (!loading && !user) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  const handleProfileClick = () => {
-    if (!profile) return;
-    if (manageMode) {
-      setEditing(true);
-      return;
-    }
-
-    selectProfile(profile);
-    navigate("/");
+  const [managing, setManaging] = useState(false);
+  const [editor, setEditor] = useState<UserProfile | "new" | null>(null);
+  const [busy, setBusy] = useState(false);
+  if (!loading && !user) return <Navigate to="/auth" replace />;
+  const logout = async () => {
+    if (busy) return;
+    setBusy(true);
+    try { await signOut(); navigate("/", { replace: true }); }
+    catch { toast.error("Não foi possível sair. Tente novamente."); }
+    finally { setBusy(false); }
   };
-
-  const handleSave = async (event: FormEvent) => {
-    event.preventDefault();
-    try {
-      await updateProfile({
-        displayName: displayName.trim(),
-        avatarUrl: avatarUrl.trim() || null,
-      });
-      setEditing(false);
-      toast.success("Perfil atualizado.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível atualizar o perfil.");
-    }
+  const retry = async () => {
+    setBusy(true);
+    try { await refreshProfile(); } catch { toast.error("Não foi possível carregar os perfis."); }
+    finally { setBusy(false); }
   };
-
-  const handleAvatarUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setUploadingAvatar(true);
-    try {
-      const publicUrl = await uploadAvatar(file);
-      setAvatarUrl(publicUrl);
-      toast.success("Foto enviada. Salve o perfil para aplicar.");
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Não foi possível enviar a imagem.");
-    } finally {
-      setUploadingAvatar(false);
-      event.target.value = "";
-    }
-  };
-
-  return (
-    <div className="revolution-screen relative min-h-screen overflow-hidden bg-black">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(229,9,20,0.22),transparent_24%),linear-gradient(180deg,rgba(0,0,0,0.16),rgba(0,0,0,0.92))]" />
-
-      <main className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
-        <section className="w-full max-w-5xl">
-          <div className="mx-auto max-w-3xl text-center">
-            <div className="text-center"><Brand centered /></div>
-            <h1 className="mt-8 text-3xl font-bold text-white sm:text-4xl md:text-5xl">Quem está assistindo?</h1>
-            <p className="mt-3 text-sm leading-6 text-white/54 md:text-base">
-              Escolha seu perfil para continuar.
-            </p>
-          </div>
-
-          <div className="mt-10 flex flex-col items-center">
-            <button
-              onClick={handleProfileClick}
-              className="group relative flex flex-col items-center"
-            >
-              <div className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[1.6rem] border border-white/10 bg-white/10 text-white shadow-[0_18px_50px_rgba(0,0,0,0.24)] transition-all group-hover:border-white/30 group-hover:bg-white/14 sm:h-36 sm:w-36">
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt={profile.display_name || "Perfil"} className="h-full w-full object-cover" />
-                ) : (
-                  <UserCircle2 size={54} className="opacity-90" />
-                )}
-              </div>
-
-              <span className="mt-4 text-base text-white/80 transition-colors group-hover:text-white sm:text-lg">
-                {profile?.display_name || "Meu perfil"}
-              </span>
-            </button>
-
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Button
-                type="button"
-                onClick={() => setManageMode((current) => !current)}
-                className="h-11 rounded-full border border-white bg-transparent px-6 text-white hover:bg-white hover:text-black"
-              >
-                {manageMode ? "Concluir" : "Gerenciar perfil"}
-              </Button>
-            </div>
-          </div>
-
-          {editing && (
-            <div className="mx-auto mt-10 max-w-xl rounded-[2rem] border border-white/10 bg-black/60 p-5 sm:p-6">
-              <div className="mb-5 flex items-center gap-2 text-white">
-                <ImageIcon size={18} />
-                <h2 className="text-xl font-semibold">Editar perfil</h2>
-              </div>
-
-              <form onSubmit={handleSave} className="space-y-4">
-                <div>
-                  <label className="mb-2 block text-sm text-white/70">Nome</label>
-                  <Input
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    className="h-12 rounded-2xl border-white/10 bg-white/[0.04] text-white"
-                  />
-                </div>
-
-                <div>
-                  <label className="mb-3 block text-sm text-white/70">Foto do perfil</label>
-                  <div className="flex flex-col gap-4 sm:flex-row">
-                    <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[1.4rem] border border-white/10 bg-white/10 text-white">
-                      {avatarUrl ? (
-                        <img src={avatarUrl} alt="Prévia do perfil" className="h-full w-full object-cover" />
-                      ) : (
-                        <UserCircle2 size={44} className="opacity-80" />
-                      )}
-                    </div>
-
-                    <div className="flex-1">
-                      <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border border-white bg-white px-5 text-sm font-semibold text-black transition-colors hover:bg-black hover:text-white">
-                        <Camera size={16} />
-                        {uploadingAvatar ? "Enviando..." : "Enviar foto"}
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="sr-only"
-                          disabled={uploadingAvatar}
-                          onChange={handleAvatarUpload}
-                        />
-                      </label>
-                      <p className="mt-3 text-xs leading-5 text-white/48">
-                        Use uma imagem do computador ou escolha uma opção da biblioteca.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="mb-3 text-sm text-white/70">Biblioteca de avatares</p>
-                  <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-                    {AVATAR_PRESETS.map((avatar) => (
-                      <button
-                        key={avatar}
-                        type="button"
-                        onClick={() => setAvatarUrl(avatar)}
-                        className={`overflow-hidden rounded-[1.2rem] border bg-white/5 transition-all hover:scale-105 ${
-                          avatarUrl === avatar ? "border-white" : "border-white/10"
-                        }`}
-                      >
-                        <img src={avatar} alt="Avatar da biblioteca" className="aspect-square w-full object-cover" />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap gap-3 pt-2">
-                  <Button type="submit" className="h-11 rounded-full border border-white bg-white px-6 text-black hover:bg-black hover:text-white">
-                    Salvar
-                  </Button>
-                  <Button type="button" onClick={() => setEditing(false)} className="h-11 rounded-full border border-white bg-transparent px-6 text-white hover:bg-white hover:text-black">
-                    Cancelar
-                  </Button>
-                </div>
-              </form>
-            </div>
-          )}
-        </section>
-      </main>
-    </div>
-  );
-};
-
-export default ProfilePage;
+  return <div className="revolution-screen relative min-h-screen bg-black">
+    <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(229,9,20,0.18),transparent_55%)]" />
+    <main className="relative mx-auto flex min-h-screen max-w-4xl flex-col items-center justify-center px-4 py-10 sm:px-6">
+      <Brand centered />
+      <h1 className="mt-9 text-center text-2xl font-bold tracking-tight text-white sm:mt-12 sm:text-4xl">{managing ? "Seus perfis" : "Quem está assistindo?"}</h1>
+      {loading ? <p role="status" className="my-12 text-sm text-white/60">Carregando perfis...</p> : profilesError ? <div className="my-9 max-w-sm text-center">
+        <p role="alert" className="text-sm leading-6 text-white/65">{profilesError}</p>
+        <Button type="button" disabled={busy} onClick={() => { void retry(); }} className="mt-4 gap-2 rounded-full bg-white/10 text-white hover:bg-white/15"><RefreshCw size={15} />Tentar novamente</Button>
+      </div> : <div className="my-9 flex w-full flex-wrap items-start justify-center gap-x-5 gap-y-7 sm:my-12 sm:gap-9">
+        {profiles.map((item) => <button key={item.id} type="button" aria-label={managing ? `Editar perfil ${item.display_name}` : `Usar perfil ${item.display_name}`} onClick={() => {
+          if (managing) setEditor(item);
+          else { selectProfile(item); navigate("/"); }
+        }} className="group flex w-24 min-w-0 flex-col items-center text-center sm:w-32">
+          <span className={`relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-2 bg-white/5 transition-colors group-hover:border-white/65 sm:h-32 sm:w-32 ${activeProfile?.id === item.id ? "border-primary" : "border-white/10"}`}>
+            {item.avatar_url ? <img src={item.avatar_url} alt="" className="h-full w-full object-cover" /> : <UserCircle2 size={48} className="text-white/65" />}
+            {managing && <span className="absolute inset-0 flex items-center justify-center bg-black/40"><Pencil size={26} className="text-white" /></span>}
+          </span>
+          <span className="mt-3 w-full break-words text-sm font-medium text-white/85 sm:text-base">{item.display_name}</span>
+          {activeProfile?.id === item.id && <span className="mt-1 inline-flex items-center gap-1 text-[10px] text-white/40"><Check size={11} />Em uso</span>}
+        </button>)}
+        {profiles.length < 3 && <button type="button" aria-label="Adicionar perfil" onClick={() => setEditor("new")} className="group flex w-24 flex-col items-center text-center sm:w-32">
+          <span className="flex h-24 w-24 items-center justify-center rounded-3xl border-2 border-dashed border-white/20 bg-white/[0.02] text-white/45 transition-colors group-hover:border-primary/70 group-hover:text-primary sm:h-32 sm:w-32"><Plus size={36} strokeWidth={1.5} /></span>
+          <span className="mt-3 text-xs text-white/55 sm:text-sm">Adicionar perfil</span>
+        </button>}
+      </div>}
+      {!loading && !profilesError && <>
+        <p className="mb-5 text-[11px] text-white/35">{profiles.length} de 3 perfis</p>
+        <Button type="button" onClick={() => setManaging((value) => !value)} className="h-11 rounded-full border border-white/25 bg-transparent px-6 text-xs text-white hover:bg-white/10">{managing ? "Concluir" : "Gerenciar perfis"}</Button>
+      </>}
+      <div className="mt-7 flex flex-wrap justify-center gap-5 text-xs text-white/50">
+        {activeProfile && <Link to="/" className="inline-flex min-h-11 items-center gap-2 hover:text-white"><ArrowLeft size={14} />Voltar ao site</Link>}
+        <button type="button" disabled={busy} onClick={() => { void logout(); }} className="inline-flex min-h-11 items-center gap-2 hover:text-red-300 disabled:opacity-40"><LogOut size={14} />{busy ? "Aguarde..." : "Sair da conta"}</button>
+      </div>
+    </main>
+    <Dialog open={editor !== null} onOpenChange={(open) => { if (!open) setEditor(null); }}>
+      <DialogContent className="max-h-[90dvh] max-w-lg overflow-y-auto rounded-3xl border-white/10 bg-[#171214] p-5 text-white sm:p-7">
+        <DialogHeader><DialogTitle>{editor === "new" ? "Criar perfil" : "Editar perfil"}</DialogTitle><DialogDescription className="text-xs leading-6 text-white/50">Uma conta, até três jeitos de assistir.</DialogDescription></DialogHeader>
+        {editor && <ProfileEditor key={editor === "new" ? "new" : editor.id} profile={editor === "new" ? undefined : editor} onSaved={() => setEditor(null)} onCancel={() => setEditor(null)} />}
+      </DialogContent>
+    </Dialog>
+  </div>;
+}

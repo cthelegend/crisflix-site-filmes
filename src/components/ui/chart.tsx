@@ -37,7 +37,7 @@ const ChartContainer = React.forwardRef<
   }
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId();
-  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`;
+  const chartId = `chart-${(id || uniqueId).replace(/[^a-zA-Z0-9_-]/g, "")}`;
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -65,26 +65,14 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null;
   }
 
-  return (
-    <style
-      dangerouslySetInnerHTML={{
-        __html: Object.entries(THEMES)
-          .map(
-            ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
-${colorConfig
-  .map(([key, itemConfig]) => {
-    const color = itemConfig.theme?.[theme as keyof typeof itemConfig.theme] || itemConfig.color;
-    return color ? `  --color-${key}: ${color};` : null;
-  })
-  .join("\n")}
-}
-`,
-          )
-          .join("\n"),
-      }}
-    />
-  );
+  const css = Object.entries(THEMES).map(([theme, prefix]) => `
+${prefix} [data-chart="${id.replace(/[^a-zA-Z0-9_-]/g, "")}"] {
+${colorConfig.filter(([key]) => /^[a-zA-Z0-9_-]+$/.test(key)).map(([key, item]) => {
+  const color = item.theme?.[theme as keyof typeof item.theme] || item.color;
+  return color && !/[;{}<>\\]/.test(color) ? `  --color-${key}: ${color};` : "";
+}).join("\n")}
+}`).join("\n");
+  return <style>{css}</style>;
 };
 
 const ChartTooltip = RechartsPrimitive.Tooltip;

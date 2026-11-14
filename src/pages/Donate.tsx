@@ -40,7 +40,7 @@ const Donate = () => {
                   src={DONATION_WIDGET_URL}
                   title="Doação Pix"
                   className="h-[320px] w-full max-w-[320px] rounded-[1.4rem] border-0 bg-transparent sm:h-[360px] sm:max-w-[360px] md:h-[400px] md:max-w-[400px]"
-                  allow="clipboard-write"
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups" referrerPolicy="strict-origin-when-cross-origin" allow="clipboard-write"
                 />
               </div>
             </div>

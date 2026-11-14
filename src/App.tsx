@@ -17,6 +17,7 @@ import About from "./pages/About";
 import LeftLibrary from "./pages/LeftLibrary";
 import AuthPage from "./pages/AuthPage";
 import ProfilePage from "./pages/ProfilePage";
+import SettingsPage from "./pages/SettingsPage";
 import MyListPage from "./pages/MyListPage";
 import SiteLayout from "./components/SiteLayout";
 
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/biblioteca" element={<LeftLibrary />} />
             <Route path="/auth" element={<AuthPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/settings" element={<SettingsPage />} />
             <Route path="/my-list" element={<MyListPage />} />
             <Route path="*" element={<NotFound />} />
           </SiteLayout>

@@ -1,27 +1,32 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { publicApi } from "./server/publicApi.js";
 
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), "");
+  return {
   server: {
-    host: "::",
+    host: "127.0.0.1",
     port: 8080,
-    proxy: {
-      "/api/futebol": {
-        target: "https://embedtv.cc",
-        changeOrigin: true,
-        rewrite: (requestPath) => requestPath.replace(/^\/api\/futebol/, "/api"),
-      },
-    },
     hmr: {
       overlay: false,
     },
   },
-  plugins: [react()],
+  plugins: [react(), {
+    name: "local-public-api",
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.url?.split("?")[0] === "/api/tmdb") void publicApi(req, res, "tmdb", env.TMDB_READ_ACCESS_TOKEN);
+        else if (req.url?.startsWith("/api/futebol/")) void publicApi(req, res, "football");
+        else next();
+      });
+    },
+  }],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
     dedupe: [
       "react",
@@ -32,4 +37,5 @@ export default defineConfig({
       "@tanstack/query-core"
     ],
   },
+  };
 });

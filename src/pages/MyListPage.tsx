@@ -43,14 +43,17 @@ const GridSection = ({ title, icon, items, emptyText }: { title: string; icon: R
 );
 
 const MyListPage = () => {
-  const { configured, loading, user } = useAuth();
+  const { configured, loading, user, activeProfile } = useAuth();
   const [watchlist, setWatchlist] = useState<UserMediaState[]>([]);
 
   useEffect(() => {
-    if (!user || !configured) return;
-
-    fetchWatchlist(user.id).then(setWatchlist);
-  }, [configured, user]);
+    let cancelled = false;
+    setWatchlist([]);
+    if (user && activeProfile && configured) void fetchWatchlist({ userId: user.id, profileId: activeProfile.id })
+      .then((items) => { if (!cancelled) setWatchlist(items); })
+      .catch(() => { if (!cancelled) setWatchlist([]); });
+    return () => { cancelled = true; };
+  }, [configured, user?.id, activeProfile?.id]);
 
   const watchlistItems = useMemo(() => watchlist.map(toMovieItem), [watchlist]);
 

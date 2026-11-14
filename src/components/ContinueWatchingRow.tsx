@@ -8,22 +8,24 @@ import { fetchRemoteContinueWatching } from "@/lib/userMedia";
 const ContinueWatchingRow = () => {
   const [items, setItems] = useState<ContinueWatchingEntry[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const { user } = useAuth();
+  const { user, activeProfile } = useAuth();
 
   useEffect(() => {
+    let disposed = false;
+    let version = 0;
+    setItems([]);
     const sync = async () => {
-      if (user) {
-        setItems(await fetchRemoteContinueWatching(user.id));
-        return;
-      }
-
-      setItems(getContinueWatching());
+      const request = ++version;
+      try {
+        const next = user ? (activeProfile ? await fetchRemoteContinueWatching({ userId: user.id, profileId: activeProfile.id }) : []) : getContinueWatching();
+        if (!disposed && request === version) setItems(next);
+      } catch { if (!disposed && request === version) setItems([]); }
     };
 
     sync();
     window.addEventListener("continue-watching-updated", sync);
-    return () => window.removeEventListener("continue-watching-updated", sync);
-  }, [user]);
+    return () => { disposed = true; window.removeEventListener("continue-watching-updated", sync); };
+  }, [user?.id, activeProfile?.id]);
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;

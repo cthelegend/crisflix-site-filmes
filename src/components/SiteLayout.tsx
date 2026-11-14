@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, LazyMotion, domAnimation, m, useIsPresent, useReducedMotion } from "motion/react";
-import { matchPath, Routes, useLocation, type Location } from "react-router-dom";
+import { matchPath, Navigate, Routes, useLocation, type Location } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import BackgroundPattern from "./BackgroundPattern";
 import Navbar from "./Navbar";
 
@@ -30,6 +31,7 @@ function RoutePage({ children, location, reducedMotion }: { children: ReactNode;
 }
 
 export default function SiteLayout({ children }: { children: ReactNode }) {
+  const { user, activeProfile, loading } = useAuth();
   const location = useLocation();
   const reducedMotion = useReducedMotion() ?? false;
   const initialPath = useRef(location.pathname);
@@ -37,10 +39,21 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   latestPath.current = location.pathname;
   const [hasNavigated, setHasNavigated] = useState(false);
   const [navigationPath, setNavigationPath] = useState(location.pathname);
+  const scopeKey = `${user?.id || "guest"}:${activeProfile?.id || "none"}`;
+  const previousScope = useRef(scopeKey);
+  useEffect(() => {
+    if (previousScope.current !== scopeKey || ["/profile", "/auth", "/settings"].includes(location.pathname)) {
+      setNavigationPath(location.pathname);
+      previousScope.current = scopeKey;
+    }
+  }, [scopeKey, location.pathname]);
   useEffect(() => {
     if (location.pathname !== initialPath.current) setHasNavigated(true);
   }, [location.pathname]);
   const showNavbar = navbarPaths.some((path) => matchPath({ path, end: true }, navigationPath));
+  if (!loading && user && !activeProfile && !["/auth", "/profile"].includes(location.pathname)) {
+    return <Navigate to="/profile" replace />;
+  }
 
   return (
     <LazyMotion features={domAnimation}>
@@ -49,7 +62,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
           <BackgroundPattern />
           {showNavbar && <Navbar />}
           <div id="site-overlays" />
-          <AnimatePresence initial={false} mode="wait" onExitComplete={() => {
+          <AnimatePresence key={scopeKey} initial={false} mode="wait" onExitComplete={() => {
             setNavigationPath(latestPath.current);
             window.scrollTo({ top: 0, left: 0, behavior: "instant" });
           }}>

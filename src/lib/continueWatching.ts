@@ -23,33 +23,45 @@ export interface ContinueWatchingEntry {
   updatedAt: number;
 }
 
-function parseCookieValue(value: string) {
-  try {
-    return JSON.parse(decodeURIComponent(value)) as ContinueWatchingEntry[];
-  } catch {
-    return [];
+const STORAGE_KEY = "foice-filme:guest-progress:v2";
+
+export function validateContinueWatching(value: unknown): ContinueWatchingEntry[] {
+  if (!Array.isArray(value)) return [];
+  const image = (v: unknown) => typeof v === "string" && /^\/[a-zA-Z0-9_.-]+$/.test(v) ? v : null;
+  const number = (v: unknown) => typeof v === "number" && Number.isSafeInteger(v) && v > 0 && v <= 1000000000 ? v : undefined;
+  return value.slice(0, MAX_ITEMS).flatMap((entry) => {
+    if (!entry || !number(entry.id) || !["movie", "tv"].includes(entry.type) || typeof entry.title !== "string"
+      || typeof entry.updatedAt !== "number" || !Number.isFinite(entry.updatedAt) || entry.updatedAt <= 0) return [];
+    return [{
+      id: entry.id, type: entry.type, title: entry.title.slice(0, 300),
+      poster_path: image(entry.poster_path), backdrop_path: image(entry.backdrop_path),
+      vote_average: typeof entry.vote_average === "number" && Number.isFinite(entry.vote_average) ? Math.max(0, Math.min(10, entry.vote_average)) : 0,
+      release_date: typeof entry.release_date === "string" ? entry.release_date.slice(0, 10) : undefined,
+      first_air_date: typeof entry.first_air_date === "string" ? entry.first_air_date.slice(0, 10) : undefined,
+      season: number(entry.season), episode: number(entry.episode),
+      progressSeconds: number(entry.progressSeconds), runtimeSeconds: number(entry.runtimeSeconds),
+      nextEpisode: number(entry.nextEpisode?.season) && number(entry.nextEpisode?.episode)
+        ? { season: entry.nextEpisode.season, episode: entry.nextEpisode.episode } : null,
+      updatedAt: entry.updatedAt,
+    } as ContinueWatchingEntry];
+  }).sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+export function clearLegacyProgressCookie() {
+  if (typeof document === "undefined") return;
+  // Old cookies have no account ownership: discard rather than import them.
+  if (document.cookie.split("; ").some((item) => item.startsWith(`${COOKIE_NAME}=`))) {
+    document.cookie = `${COOKIE_NAME}=; Max-Age=0; path=/; SameSite=Lax`;
   }
 }
 
-function getCookie(name: string) {
-  if (typeof document === "undefined") return null;
-
-  const found = document.cookie
-    .split("; ")
-    .find((item) => item.startsWith(`${name}=`));
-
-  return found ? found.slice(name.length + 1) : null;
-}
-
-function setCookie(name: string, value: string) {
-  if (typeof document === "undefined") return;
-  document.cookie = `${name}=${value}; path=/; SameSite=Lax`;
-}
-
 export function getContinueWatching() {
-  const cookie = getCookie(COOKIE_NAME);
-  if (!cookie) return [];
-  return parseCookieValue(cookie).sort((a, b) => b.updatedAt - a.updatedAt);
+  if (typeof document === "undefined") return [];
+  clearLegacyProgressCookie();
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw && raw.length <= 50000 ? validateContinueWatching(JSON.parse(raw)) : [];
+  } catch { return []; }
 }
 
 export function getContinueWatchingItem(type: "movie" | "tv", id: number) {
@@ -58,8 +70,8 @@ export function getContinueWatchingItem(type: "movie" | "tv", id: number) {
 
 export function saveContinueWatching(entry: ContinueWatchingEntry) {
   const current = getContinueWatching().filter((item) => !(item.type === entry.type && item.id === entry.id));
-  const next = [entry, ...current].slice(0, MAX_ITEMS);
-  setCookie(COOKIE_NAME, encodeURIComponent(JSON.stringify(next)));
+  const next = validateContinueWatching([entry, ...current]);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* storage disabled or full */ }
   window.dispatchEvent(new CustomEvent("continue-watching-updated"));
 }
 

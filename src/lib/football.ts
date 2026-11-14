@@ -1,3 +1,4 @@
+import { safePlayerUrl } from "@/lib/security";
 export interface FootballTeam {
   name: string;
   image: string | null;
@@ -40,10 +41,10 @@ export function footballSlug(title: string) {
   return title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-function text(value: unknown, fallback = "") { return typeof value === "string" && value.trim() ? value.trim() : fallback; }
+function text(value: unknown, fallback = "") { return typeof value === "string" && value.trim() ? value.trim().slice(0, 300) : fallback; }
 function timestamp(value?: string) { const time = Date.parse(value || ""); return Number.isFinite(time) ? time : null; }
 function imageUrl(value?: string) {
-  try { const url = new URL(value || ""); return url.protocol === "https:" ? url.href : null; }
+  try { const url = new URL(value || ""); return url.protocol === "https:" && url.hostname === "imagecache.365scores.com" && !url.username && !url.password && !url.port ? url.href : null; }
   catch { return null; }
 }
 
@@ -55,7 +56,7 @@ async function fetchFeed(endpoint: "events" | "channels" | "epg_all", signal?: A
   const timeout = window.setTimeout(abort, 12000);
   try {
     // Same-origin rewrites avoid the provider's CORS restrictions in production and development.
-    const response = await fetch(`/api/futebol/${endpoint}`, { signal: controller.signal });
+    const response = await fetch(`/api/futebol/${endpoint}`, { signal: controller.signal, credentials: "omit" });
     if (!response.ok) throw new Error("Não foi possível consultar as transmissões agora.");
     return await response.json();
   } finally {
@@ -117,7 +118,7 @@ export function buildFootballGames(events: EmbedTVEvent[], channels: EmbedTVChan
     for (const source of Array.isArray(event.players) ? event.players : []) {
       try {
         const url = new URL(source);
-        if (url.protocol !== "https:" || !(url.hostname === "embedtv.cc" || url.hostname.endsWith(".embedtv.cc"))) continue;
+        if (!safePlayerUrl(url.href, ["embedtv.cc"])) continue;
         const parts = url.pathname.split("/").filter(Boolean);
         const id = parts[parts.length - 1] || "";
         if (!id || players.has(id)) continue;

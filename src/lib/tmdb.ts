@@ -1,11 +1,5 @@
-const API_KEY = "eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJiMTc5ZjM1ZTc3NWQxMGExZTE5MDFjMGQxMjE4OGRhZCIsIm5iZiI6MTc2OTMwNzE2Mi4yMzgwMDAyLCJzdWIiOiI2OTc1N2MxYTg1ZjcxMzkwZGVhYjk4YmMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.XGOiqOzvZiBHUf8e0ddTw41lRSVodcDID8cE9MTQfko";
-const BASE_URL = "https://api.themoviedb.org/3";
 const IMG_BASE = "https://image.tmdb.org/t/p";
 
-const headers = {
-  Authorization: `Bearer ${API_KEY}`,
-  "Content-Type": "application/json",
-};
 
 export const getImageUrl = (path: string | null, size = "w500") =>
   path ? `${IMG_BASE}/${size}${path}` : "/placeholder.svg";
@@ -19,10 +13,11 @@ export const formatDisplayedRating = (voteAverage?: number) =>
 const getTodayDate = () => new Date().toISOString().slice(0, 10);
 
 async function fetchTMDB<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
-  const url = new URL(`${BASE_URL}${endpoint}`);
+  const url = new URL("/api/tmdb", window.location.origin);
+  url.searchParams.set("path", endpoint);
   url.searchParams.set("language", "pt-BR");
   Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
-  const res = await fetch(url.toString(), { headers });
+  const res = await fetch(url.toString(), { signal: AbortSignal.timeout(12000), credentials: "omit" });
   if (!res.ok) throw new Error(`TMDB Error: ${res.status}`);
   return res.json();
 }
@@ -159,7 +154,7 @@ export const getTVSeason = (tvId: number, seasonNumber: number) =>
   fetchTMDB<Season>(`/tv/${tvId}/season/${seasonNumber}`);
 
 export const getIMDbUrl = (imdbId?: string | null) =>
-  imdbId ? `https://www.imdb.com/title/${imdbId}/` : null;
+  imdbId && /^tt[0-9]{5,12}$/.test(imdbId) ? `https://www.imdb.com/title/${imdbId}/` : null;
 
 export const searchMulti = (query: string) =>
   fetchTMDB<TMDBResponse>("/search/multi", { query });

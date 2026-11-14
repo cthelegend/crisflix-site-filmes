@@ -137,10 +137,13 @@ const Index = () => {
   const { preparing, showLoader } = useInitialMediaReady(contentRef, rowsReady && heroReady && !loading);
 
   useEffect(() => {
-    if (!user || !configured) return;
-
-    fetchWatchlist(user.id).then(setWatchlist).catch(() => setWatchlist([]));
-  }, [configured, user]);
+    let cancelled = false;
+    setWatchlist([]);
+    if (user && activeProfile && configured) void fetchWatchlist({ userId: user.id, profileId: activeProfile.id })
+      .then((items) => { if (!cancelled) setWatchlist(items); })
+      .catch(() => { if (!cancelled) setWatchlist([]); });
+    return () => { cancelled = true; };
+  }, [configured, user?.id, activeProfile?.id]);
 
   useEffect(() => {
     let cancelled = false;

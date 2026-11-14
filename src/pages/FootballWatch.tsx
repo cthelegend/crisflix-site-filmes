@@ -1,3 +1,4 @@
+import { PLAYER_SANDBOX } from "@/lib/security";
 import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, RefreshCw } from "lucide-react";
@@ -23,7 +24,7 @@ export default function FootballWatch() {
         {player.program && <p className="mt-2 truncate pb-1 text-[10px] text-white/45">Agora no canal: {player.program}</p>}
       </section>}
       <div className="min-h-0 flex-1">
-        {game && player ? <iframe key={`${game.slug}:${player.id}:${reload}`} src={player.url} title={`Transmissão: ${game.title} · ${player.name}`} allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="block h-full w-full border-0 bg-black" />
+        {game && player ? <iframe key={`${game.slug}:${player.id}:${reload}`} src={player.url} title={`Transmissão: ${game.title} · ${player.name}`} sandbox={PLAYER_SANDBOX} referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="block h-full w-full border-0 bg-black" />
           : <div className="flex h-full items-center justify-center px-6 text-center"><div>{isPending ? <p role="status" className="text-sm text-white/55">Carregando transmissão...</p> : <><h2 className="text-xl font-semibold">{isError ? "Não foi possível consultar a transmissão" : "Partida fora do ar"}</h2><p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-white/50">{isError ? "Tente atualizar ou escolha outra partida." : "Este jogo pode ter terminado ou ainda não estar disponível. Veja a lista atual de partidas."}</p><div className="mt-6 flex flex-wrap justify-center gap-3"><Link to="/futebol" className="inline-flex min-h-11 items-center rounded-full bg-white px-5 text-xs font-semibold text-black">Ver partidas</Link><button type="button" disabled={isFetching} onClick={() => void refetch()} className="min-h-11 rounded-full border border-white/20 px-5 text-xs disabled:opacity-50">Atualizar</button></div></>}</div></div>}
       </div>
     </main>

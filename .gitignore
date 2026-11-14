@@ -1,1 +1,7 @@
 node_modules
+
+# Local credentials must never enter Git or a deployment artifact.
+.env
+.env.*
+!.env.example
+.vercel/

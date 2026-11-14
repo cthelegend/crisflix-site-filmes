@@ -4,20 +4,39 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/api/futebol/events",
-      "destination": "https://embedtv.cc/api/events"
-    },
-    {
-      "source": "/api/futebol/channels",
-      "destination": "https://embedtv.cc/api/channels"
-    },
-    {
-      "source": "/api/futebol/epg_all",
-      "destination": "https://embedtv.cc/api/epg_all"
-    },
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://image.tmdb.org https://imagecache.365scores.com https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://superflixapi.rest https://*.superflixapi.rest https://embedtv.cc https://*.embedtv.cc https://widget.livepix.gg; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(), microphone=(), geolocation=(), payment=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains; preload"
+        }
+      ]
     }
   ]
 }
