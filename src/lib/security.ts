@@ -1,9 +1,11 @@
 export const PLAYER_SANDBOX = "allow-scripts allow-same-origin allow-forms allow-presentation";
+export const MOVIE_PLAYER_HOSTS = ["superflixapi.rest", "superflixapi.monster", "superflixapi.fun", "superflixapi.boats"];
+export const CURRENT_MOVIE_PLAYER_HOST = "superflixapi.boats";
 export const AVATAR_MAX_BYTES = 2 * 1024 * 1024;
 export const AVATAR_MIME_TYPES = ["image/png", "image/jpeg", "image/webp"];
 export const AVATAR_PRESETS = Array.from({ length: 6 }, (_, i) => `/avatars/preset-${i + 1}.svg`);
 
-export function safePlayerUrl(value: string, hosts = ["superflixapi.rest", "embedtv.cc"]): string | null {
+export function safePlayerUrl(value: string, hosts = [...MOVIE_PLAYER_HOSTS, "embedtv.cc"]): string | null {
   try {
     const url = new URL(value);
     const host = url.hostname.toLowerCase();

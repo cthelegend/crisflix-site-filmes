@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
 import { publicApi, upstreamRequest } from "./publicApi.js";
+import eventsHandler from "../api/futebol/events.js";
+import channelsHandler from "../api/futebol/channels.js";
+import epgHandler from "../api/futebol/epg_all.js";
 afterEach(() => vi.unstubAllGlobals());
 const response = () => ({ headers: {}, statusCode: 0, setHeader(key, value) { this.headers[key] = value; }, end: vi.fn() });
 describe("Public API boundary", () => {
@@ -57,6 +60,26 @@ describe("Public API boundary", () => {
     const res = response(); await publicApi({ method: "GET", url: "/api/futebol/events" }, res, "football");
     expect(res.statusCode).toBe(502); expect(res.end.mock.calls[0][0]).not.toContain("secret");
   });
+  it.each([
+    ["events", eventsHandler, [{ title: "Brasil x Japão" }]],
+    ["channels", channelsHandler, { channels: [{ id: "sportv", name: "SporTV" }] }],
+    ["epg_all", epgHandler, []],
+  ])("serves the static %s route with JSON mislabeled as HTML", async (feed, handler, data) => {
+    const fetch = vi.fn().mockResolvedValue(new Response(JSON.stringify(data), { headers: { "Content-Type": "text/html; charset=UTF-8" } }));
+    vi.stubGlobal("fetch", fetch);
+    const res = response();
+    await handler({ method: "GET", url: `/api/futebol/${feed}`, headers: {} }, res);
+    expect(res.statusCode).toBe(200);
+    expect(res.headers["Content-Type"]).toBe("application/json; charset=utf-8");
+    expect(JSON.parse(res.end.mock.calls[0][0].toString())).toEqual(data);
+    expect(fetch.mock.calls[0][0]).toBe(`https://embedtv.cc/api/${feed}`);
+  });
+  it.each([["events", {}], ["channels", []], ["epg_all", { error: "invalid" }]])("rejects invalid JSON shape for %s", async (feed, data) => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify(data), { headers: { "Content-Type": "text/html" } })));
+    const res = response();
+    await publicApi({ method: "GET", url: `/api/futebol/${feed}` }, res, "football");
+    expect(res.statusCode).toBe(502);
+  });
   it("does not publicly cache search queries", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response('{"results":[]}', { headers: { "Content-Type": "application/json" } })));
     const res = response(); await publicApi({ method: "GET", url: "/api/tmdb?path=/search/multi&query=test" }, res, "tmdb", "token");
@@ -71,5 +94,6 @@ describe("Production policy", () => {
     expect(headers["Content-Security-Policy"]).toContain("object-src 'none';");
     expect(headers["Content-Security-Policy"]).toContain("frame-ancestors 'none';");
     expect(headers["X-Content-Type-Options"]).toBe("nosniff");
+    expect(headers["Content-Security-Policy"]).toContain("https://superflixapi.boats");
   });
 });

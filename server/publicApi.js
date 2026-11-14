@@ -57,7 +57,8 @@ export async function publicApi(req, res, kind, token = process.env.TMDB_READ_AC
     const response = await fetch(upstream.url, {
       headers: upstream.headers, redirect: "error", signal: AbortSignal.timeout(10000),
     });
-    if (!response.ok || !response.headers.get("content-type")?.includes("application/json")) {
+    // EmbedTV labels some JSON feeds as text/html; validate the bounded body below.
+    if (!response.ok || kind !== "football" && !response.headers.get("content-type")?.includes("application/json")) {
       return fail(502, "Fonte temporariamente indisponível.");
     }
     const reader = response.body.getReader();
@@ -71,7 +72,11 @@ export async function publicApi(req, res, kind, token = process.env.TMDB_READ_AC
       chunks.push(value);
     }
     const body = Buffer.concat(chunks);
-    JSON.parse(body.toString("utf8"));
+    const data = JSON.parse(body.toString("utf8"));
+    if (kind === "football") {
+      const channels = new URL(upstream.url).pathname.endsWith("/channels");
+      if (channels ? !data || !Array.isArray(data.channels) : !Array.isArray(data)) return fail(502, "Resposta inválida da fonte.");
+    }
     // Public catalog only. Search queries are not stored in shared caches.
     const search = new URL(upstream.url).pathname.endsWith("/search/multi");
     res.setHeader("Cache-Control", search ? "no-store" : "public, max-age=0, s-maxage=60, stale-while-revalidate=60");

@@ -1,4 +1,4 @@
-import { safePlayerUrl } from "@/lib/security";
+import { CURRENT_MOVIE_PLAYER_HOST, MOVIE_PLAYER_HOSTS, safePlayerUrl } from "@/lib/security";
 export type PlayerMediaType = "movie" | "tv";
 
 interface ProviderContext {
@@ -33,7 +33,16 @@ export function getDubbedPlayerSource(type: PlayerMediaType, context: ProviderCo
       if (value === undefined || value === null || value === "") { complete = false; break; }
       source = source.split(token).join(encodeURIComponent(String(value)));
     }
-    if (complete) { const safe = safePlayerUrl(source, ["superflixapi.rest"]); if (safe) return safe; }
+    if (complete) {
+      const safe = safePlayerUrl(source, MOVIE_PLAYER_HOSTS);
+      if (safe) {
+        const url = new URL(safe);
+        // Older configured domains currently chain through three redirects.
+        // Use the verified destination directly to avoid CSP/network failures.
+        if (MOVIE_PLAYER_HOSTS.includes(url.hostname)) url.hostname = CURRENT_MOVIE_PLAYER_HOST;
+        return url.href;
+      }
+    }
   }
   return null;
 }

@@ -1,7 +1,7 @@
 import { PLAYER_SANDBOX } from "@/lib/security";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowLeft, RotateCw } from "lucide-react";
+import { ArrowLeft, ExternalLink, RotateCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { ContinueWatchingEntry, saveContinueWatching } from "@/lib/continueWatching";
 import { getDubbedPlayerSource } from "@/lib/playerProviders";
@@ -152,7 +152,10 @@ const Watch = () => {
           <ArrowLeft size={18} /> Voltar
         </button>
         <p className="min-w-0 flex-1 truncate text-sm text-white/70">{details?.title || details?.name || "Assistir"}</p>
-        {iframeSrc && <button type="button" aria-label="Recarregar player" title="Recarregar player" onClick={() => { setPlayerLoaded(false); setReloadIndex((value) => value + 1); }} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20"><RotateCw size={18} /></button>}
+        {iframeSrc && <>
+          <a href={iframeSrc} target="_blank" rel="noopener noreferrer" aria-label="Abrir player em outra aba" title="Se o provedor bloquear o player, abra em outra aba" className="inline-flex h-10 w-10 shrink-0 items-center justify-center gap-2 rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20 md:w-auto md:px-4"><ExternalLink size={18} /><span className="hidden text-xs md:inline">Abrir player</span></a>
+          <button type="button" aria-label="Recarregar player" title="Recarregar player" onClick={() => { setPlayerLoaded(false); setReloadIndex((value) => value + 1); }} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20"><RotateCw size={18} /></button>
+        </>}
       </header>
       <div className="min-h-0 flex-1">
         {iframeSrc ? (

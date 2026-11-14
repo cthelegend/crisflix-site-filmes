@@ -14,7 +14,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://image.tmdb.org https://imagecache.365scores.com https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://superflixapi.rest https://*.superflixapi.rest https://embedtv.cc https://*.embedtv.cc https://widget.livepix.gg; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://image.tmdb.org https://imagecache.365scores.com https://*.supabase.co; connect-src 'self' https://*.supabase.co wss://*.supabase.co; frame-src https://superflixapi.rest https://*.superflixapi.rest https://superflixapi.monster https://*.superflixapi.monster https://superflixapi.fun https://*.superflixapi.fun https://superflixapi.boats https://*.superflixapi.boats https://embedtv.cc https://*.embedtv.cc https://widget.livepix.gg; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; upgrade-insecure-requests"
         },
         {
           "key": "X-Content-Type-Options",
