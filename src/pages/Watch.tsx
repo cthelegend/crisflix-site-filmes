@@ -6,6 +6,7 @@ import { ContinueWatchingEntry, saveContinueWatching } from "@/lib/continueWatch
 import { getDubbedPlayerSource } from "@/lib/playerProviders";
 import { saveRemoteContinueWatching } from "@/lib/userMedia";
 import { MovieDetails, Season, getMovieDetails, getTVDetails, getTVSeason } from "@/lib/tmdb";
+import PlayerWatermark from "@/components/PlayerWatermark";
 
 const SAVE_INTERVAL_MS = 15000;
 const METADATA_TIMEOUT_MS = 8000;
@@ -153,11 +154,14 @@ const Watch = () => {
         <p className="min-w-0 flex-1 truncate text-sm text-white/70">{details?.title || details?.name || "Assistir"}</p>
         {iframeSrc && <button type="button" aria-label="Recarregar player" title="Recarregar player" onClick={() => { setPlayerLoaded(false); setReloadIndex((value) => value + 1); }} className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/10 text-white/80 transition-colors hover:bg-white/20"><RotateCw size={18} /></button>}
       </header>
-      <div className="min-h-0 flex-1">
+      <div className="relative min-h-0 flex-1">
         {iframeSrc ? (
+          <>
           <iframe key={`${iframeSrc}:${reloadIndex}`} title="Player dublado" tabIndex={0} src={iframeSrc}
             allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen
             className="block h-full w-full border-0 bg-black" onLoad={() => setPlayerLoaded(true)} />
+          <PlayerWatermark />
+          </>
         ) : (
           <div className="flex h-full items-center justify-center px-6 text-center text-white">
             {detailsLoading ? <p role="status" className="text-white/65">Carregando player...</p> : (
