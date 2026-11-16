@@ -1,3 +1,4 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
 import CastSection from "@/components/CastSection";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -35,6 +36,7 @@ const formatDuration = (runtime?: number) => {
 };
 
 const Details = () => {
+  useSitePreferences();
   const { type, id } = useParams<{ type: string; id: string }>();
   const [loadError, setLoadError] = useState(false);
   const [details, setDetails] = useState<MovieDetails | null>(null);
@@ -234,7 +236,7 @@ const Details = () => {
             </div>
 
             <div className="max-w-4xl">
-              <div className="mb-3 flex flex-wrap items-center gap-2 text-[9px] uppercase tracking-[0.18em] md:mb-4 md:gap-3 md:text-[11px] md:tracking-[0.35em] text-white/60">
+              <div className="mb-3 flex flex-wrap items-center gap-2 text-[0.5625rem] uppercase tracking-[0.18em] md:mb-4 md:gap-3 md:text-[0.6875rem] md:tracking-[0.35em] text-white/60">
                 <span>{isTV ? "Série" : "Filme"}</span>
                 {year && <span>{year}</span>}
                 <span>{details.status || "Catálogo"}</span>
@@ -245,9 +247,9 @@ const Details = () => {
               </h1>
               {details.tagline && <p className="mt-3 text-sm italic md:mt-4 md:text-lg text-white/64">{details.tagline}</p>}
 
-              <div className="details-badges mt-4 flex flex-wrap gap-2 text-[11px] text-white/82 md:mt-6 md:gap-3 md:text-sm">
+              <div className="details-badges mt-4 flex flex-wrap gap-2 text-[0.6875rem] text-white/82 md:mt-6 md:gap-3 md:text-sm">
                 <span className="inline-flex items-center gap-2 rounded-full bg-[#f5c518] px-4 py-2 font-semibold text-black">
-                  <span className="rounded-[0.45rem] bg-black px-2 py-0.5 text-[10px] uppercase tracking-[0.18em] text-[#f5c518]">
+                  <span className="rounded-[0.45rem] bg-black px-2 py-0.5 text-[0.625rem] uppercase tracking-[0.18em] text-[#f5c518]">
                     IMDb
                   </span>
                   {formatDisplayedRating(details.vote_average)}
@@ -258,7 +260,7 @@ const Details = () => {
                 </span>
               </div>
 
-              <p id="details-synopsis" className={`mt-4 max-w-3xl text-[13px] leading-[1.7] text-white/70 md:mt-6 md:text-base ${overviewExpanded ? "" : "line-clamp-4 md:line-clamp-none"}`}>
+              <p id="details-synopsis" className={`mt-4 max-w-3xl text-[0.8125rem] leading-[1.7] text-white/70 md:mt-6 md:text-base ${overviewExpanded ? "" : "line-clamp-4 md:line-clamp-none"}`}>
                 {details.overview || "Sinopse não informada."}
               </p>
               {details.overview?.length > 220 && <button type="button" aria-expanded={overviewExpanded} aria-controls="details-synopsis" onClick={() => setOverviewExpanded((value) => !value)} className="inline-flex min-h-11 items-center text-xs font-medium text-white/80 md:hidden">{overviewExpanded ? "Recolher sinopse" : "Ler sinopse completa"}</button>}
@@ -321,7 +323,7 @@ const Details = () => {
           <div className="rounded-2xl border border-white/[0.06] bg-white/[0.035] p-4 md:rounded-[2rem] md:p-6">
             <div className="facts-summary flex flex-wrap items-center gap-4 text-sm text-white/76">
               <div className="inline-flex items-center gap-2 rounded-full bg-[#f5c518] px-3 py-1.5 font-semibold text-black">
-                <span className="rounded-[0.35rem] bg-black px-1.5 py-0.5 text-[9px] uppercase tracking-[0.18em] text-[#f5c518]">
+                <span className="rounded-[0.35rem] bg-black px-1.5 py-0.5 text-[0.5625rem] uppercase tracking-[0.18em] text-[#f5c518]">
                   IMDb
                 </span>
                 <span>{formatDisplayedRating(details.vote_average)}</span>
@@ -415,9 +417,9 @@ const Details = () => {
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-[9px] uppercase tracking-[0.12em] text-white/42 md:text-xs md:tracking-[0.28em]">Episódio {ep.episode_number}</p>
+                    <p className="text-[0.5625rem] uppercase tracking-[0.12em] text-white/42 md:text-xs md:tracking-[0.28em]">Episódio {ep.episode_number}</p>
                     <p className="mt-0.5 line-clamp-2 text-xs font-semibold md:line-clamp-none text-white md:mt-1 md:text-base">{ep.name}</p>
-                    <p className="mt-1 line-clamp-1 text-[10px] leading-4 md:line-clamp-2 text-white/50 md:mt-2 md:text-sm md:leading-6">
+                    <p className="mt-1 line-clamp-1 text-[0.625rem] leading-4 md:line-clamp-2 text-white/50 md:mt-2 md:text-sm md:leading-6">
                       {ep.overview || "Resumo não informado."}
                     </p>
                   </div>

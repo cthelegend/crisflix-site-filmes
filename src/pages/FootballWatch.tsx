@@ -21,7 +21,7 @@ export default function FootballWatch() {
       </header>
       {game && player && <section aria-label="Canais da partida" className="shrink-0 border-b border-white/10 bg-[#120f11] px-3 py-2 md:px-6">
         <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{game.players.map((source) => <button key={source.id} type="button" aria-pressed={source.id === player.id} onClick={() => setSelectedSource(`${game.slug}:${source.id}`)} className={`min-h-11 shrink-0 rounded-full border px-4 text-xs font-medium ${source.id === player.id ? "border-white bg-white text-black" : "border-white/15 bg-white/5 text-white/65 hover:bg-white/10"}`}>{source.name}</button>)}</div>
-        {player.program && <p className="mt-2 truncate pb-1 text-[10px] text-white/45">Agora no canal: {player.program}</p>}
+        {player.program && <p className="mt-2 truncate pb-1 text-[0.625rem] text-white/45">Agora no canal: {player.program}</p>}
       </section>}
       <div className="min-h-0 flex-1">
         {game && player ? <iframe key={`${game.slug}:${player.id}:${reload}`} src={player.url} title={`Transmissão: ${game.title} · ${player.name}`} sandbox={PLAYER_SANDBOX} referrerPolicy="strict-origin-when-cross-origin" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowFullScreen className="block h-full w-full border-0 bg-black" />

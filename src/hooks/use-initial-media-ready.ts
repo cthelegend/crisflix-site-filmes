@@ -1,3 +1,4 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
 import { useEffect, useState, type RefObject } from "react";
 
 const MAX_LOADING_MS = 15000;
@@ -24,15 +25,15 @@ function waitForImage(image: HTMLImageElement): Promise<void> {
 
 /** Prepare the first screen, leaving offscreen posters lazy and avoiding an endless loader. */
 export function useInitialMediaReady(content: RefObject<HTMLElement>, dataReady: boolean) {
+  const { reducedMotion, preferences } = useSitePreferences();
   const [preparing, setPreparing] = useState(true);
   const [showLoader, setShowLoader] = useState(true);
 
   useEffect(() => {
     if (preparing) return;
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const timeout = window.setTimeout(() => setShowLoader(false), reducedMotion ? 0 : 320);
     return () => window.clearTimeout(timeout);
-  }, [preparing]);
+  }, [preparing, reducedMotion]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => setPreparing(false), MAX_LOADING_MS);
@@ -58,7 +59,7 @@ export function useInitialMediaReady(content: RefObject<HTMLElement>, dataReady:
         if (!root || cancelled) return;
         const images = Array.from(root.querySelectorAll<HTMLImageElement>("img")).filter((image) => {
           const rect = image.getBoundingClientRect();
-          return rect.width > 0 && rect.height > 0 && rect.top < window.innerHeight + 160 && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
+          return rect.width > 0 && rect.height > 0 && rect.top < window.innerHeight + (preferences.saveData ? 0 : 160) && rect.bottom > 0 && rect.left < window.innerWidth && rect.right > 0;
         });
         images.forEach((image) => { image.loading = "eager"; });
 
@@ -76,7 +77,7 @@ export function useInitialMediaReady(content: RefObject<HTMLElement>, dataReady:
       });
     });
     return () => { cancelled = true; cancelAnimationFrame(frame); };
-  }, [content, dataReady, preparing]);
+  }, [content, dataReady, preparing, preferences.saveData]);
 
   return { preparing, showLoader };
 }

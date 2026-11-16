@@ -43,12 +43,12 @@ export default function Football() {
           {isPending ? <div role="status" className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"><span className="sr-only">Carregando partidas...</span>{[0, 1, 2, 3].map((item) => <div key={item} className="h-64 animate-pulse rounded-3xl border border-white/5 bg-white/[0.035]" />)}</div>
             : matches.length ? <div className="animate-fade-in grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-3 xl:grid-cols-4">
               {matches.map((game) => <Link key={game.slug} to={`/futebol/${game.slug}`} aria-label={`Assistir ${game.title}`} className="football-card group flex min-w-0 flex-col rounded-3xl border border-white/[0.08] bg-[#141214] p-4 transition-colors hover:border-primary/40 hover:bg-[#1c1417] sm:p-4">
-                <p className="line-clamp-2 text-center text-[9px] font-medium uppercase leading-4 tracking-[0.12em] text-white/40">{game.league}</p>
+                <p className="line-clamp-2 text-center text-[0.5625rem] font-medium uppercase leading-4 tracking-[0.12em] text-white/40">{game.league}</p>
                 <div className="mt-3 flex items-start gap-3"><Team team={game.home} /><span aria-hidden="true" className="pt-5 text-xs font-semibold text-white/25">×</span><Team team={game.away} /></div>
                 <div className="mt-auto flex min-h-9 justify-center pt-3 text-center">
-                  {!game.startsAt ? <span className="text-[10px] text-white/45">Horário a confirmar</span>
-                    : game.startsAt <= now ? <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-0.5 text-[10px] font-semibold text-red-300"><span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" />Ao vivo</span>
-                    : <span className="football-countdown inline-flex items-center gap-1.5 text-[10px] tabular-nums text-white/55"><Clock3 size={12} />Começa em {formatGameCountdown(game.startsAt, now)}</span>}
+                  {!game.startsAt ? <span className="text-[0.625rem] text-white/45">Horário a confirmar</span>
+                    : game.startsAt <= now ? <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-0.5 text-[0.625rem] font-semibold text-red-300"><span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-primary" />Ao vivo</span>
+                    : <span className="football-countdown inline-flex items-center gap-1.5 text-[0.625rem] tabular-nums text-white/55"><Clock3 size={12} />Começa em {formatGameCountdown(game.startsAt, now)}</span>}
                 </div>
               </Link>)}
             </div> : !isError && <div className="rounded-3xl border border-white/[0.06] bg-white/[0.02] px-5 py-14 text-center"><Trophy size={30} strokeWidth={1.25} className="mx-auto mb-4 text-white/25" /><h3 className="text-base font-semibold">{query.trim() ? "Nenhuma partida encontrada" : "Nenhuma partida disponível agora"}</h3><p className="mx-auto mt-2 max-w-sm text-xs leading-6 text-white/45">{query.trim() ? "Tente outro time ou campeonato." : "Assim que uma transmissão entrar no ar, ela aparecerá aqui. A lista se atualiza automaticamente."}</p>{query.trim() && <button type="button" onClick={() => setQuery("")} className="mt-4 min-h-11 rounded-full border border-white/15 px-4 text-xs">Limpar busca</button>}</div>}

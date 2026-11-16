@@ -1,3 +1,4 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ContinueWatchingCard from "@/components/ContinueWatchingCard";
@@ -6,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { fetchRemoteContinueWatching } from "@/lib/userMedia";
 
 const ContinueWatchingRow = () => {
+  const { reducedMotion } = useSitePreferences();
   const [items, setItems] = useState<ContinueWatchingEntry[]>([]);
   const scrollRef = useRef<HTMLDivElement>(null);
   const { user, activeProfile } = useAuth();
@@ -30,7 +32,7 @@ const ContinueWatchingRow = () => {
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     const amount = scrollRef.current.clientWidth * 0.82;
-    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: reducedMotion ? "auto" : "smooth" });
   };
 
   if (!items.length) return null;

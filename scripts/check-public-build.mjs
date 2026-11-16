@@ -2,10 +2,11 @@ import { readFile, readdir } from "node:fs/promises";
 import path from "node:path";
 
 // A build must not publish privileged Supabase keys or server credentials.
-const secrets = [process.env.TMDB_READ_ACCESS_TOKEN];
+const privateNames = ["TMDB_READ_ACCESS_TOKEN", "ADMIN_PASSWORD_HASH", "SUPABASE_SERVICE_ROLE_KEY"];
+const secrets = privateNames.map(name => process.env[name]);
 try {
   const local = await readFile(".env.local", "utf8");
-  secrets.push(local.match(/^TMDB_READ_ACCESS_TOKEN=(.+)$/m)?.[1]?.trim().replace(/^['"]|['"]$/g, ""));
+  for (const name of privateNames) secrets.push(local.match(new RegExp(`^${name}=(.+)$`, "m"))?.[1]?.trim().replace(/^['"]|['"]$/g, ""));
 } catch { /* CI uses environment variables */ }
 let checked = 0;
 async function inspect(directory) {

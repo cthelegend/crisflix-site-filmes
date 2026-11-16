@@ -91,3 +91,53 @@ Desenvolvido por **cris15k**
 
 ---
 
+
+## Preferências do site
+
+Em Configurações, o visitante autenticado pode escolher animações completas,
+reduzidas ou conforme o sistema, pausar os destaques, ajustar cards e texto,
+ativar economia de dados e selecionar Início, Minha lista ou Biblioteca como
+página inicial. As opções anteriores de atalhos foram substituídas.
+
+Com o armazenamento opcional aceito, as escolhas são salvas neste navegador e
+sincronizadas entre suas abas. Sem autorização, valem apenas durante a visita.
+As opções podem ser restauradas aos padrões. O destino inicial é aplicado só ao entrar pela
+raiz ou escolher um perfil; links diretos e o botão Início continuam disponíveis.
+Minha lista como entrada exige uma sessão autenticada.
+
+Economia de dados reduz os tamanhos das imagens TMDB, evita antecipar banners
+não visitados, troca o GIF de loading pela imagem estática e reduz páginas e
+itens carregados no catálogo inicial. A preferência não modifica a integração
+ou a qualidade de vídeo dos players externos.
+
+
+## Cookies, privacidade e termos
+
+As páginas `/termos` e `/privacidade` e o gerenciador de cookies estão no rodapé.
+O aviso oferece aceitar ou recusar o armazenamento opcional, sem seleção prévia,
+e permite rever a escolha. A decisão dura até 180 dias. Preferências, lembretes
+da interface e progresso de visitantes só recebem novos registros persistentes
+após autorização; sem ela, funcionam em memória durante a visita. Revogar remove
+esses registros locais, preservando autenticação e dados associados à conta.
+
+O cadastro exige aceitação separada dos termos e registra versão e instante
+nos metadados da conta Supabase. Isso não é um registro de auditoria imutável.
+Não é necessária nova migração SQL para esta alteração. O contato institucional
+é foiceefilme@gmail.com; a versão dos documentos fica em `src/lib/legal.ts`.
+
+A política descreve os dados efetivamente utilizados: contas, perfis, listas,
+histórico, avatares e infraestrutura externa. O gerenciador controla somente o
+armazenamento opcional implementado pelo site, sem controlar cookies internos
+dos players externos. Os termos descrevem a agregação de links/APIs, a ausência
+de hospedagem dos arquivos audiovisuais e pedidos de revisão de referências.
+O texto deve acompanhar mudanças reais no serviço e não garante imunidade
+jurídica ou substitui revisão profissional.
+
+
+## Painel editorial
+
+A rota `/cris` administra destaques, avisos agendados, temas especiais, categorias
+editoriais, biblioteca e personalização. Inclui rascunhos, publicação, histórico
+e backup JSON. Consulte [ADMIN.md](ADMIN.md) para ativar a migração e as variáveis
+privadas na Vercel. Senhas e chaves administrativas nunca devem ter prefixo
+`VITE_`. O modo local via Vite funciona sem a chave secreta do banco.

@@ -19,7 +19,7 @@ export default function About() {
           </p>
         </header>
 
-        <article aria-label="Sobre o Foice e Filme" className="mx-auto mt-7 max-w-3xl space-y-6 hyphens-auto text-justify text-sm leading-7 text-white/90 sm:leading-8 md:mt-9 md:text-[15px] [&_strong]:font-semibold [&_strong]:text-white">
+        <article aria-label="Sobre o Foice e Filme" className="mx-auto mt-7 max-w-3xl space-y-6 hyphens-auto text-justify text-sm leading-7 text-white/90 sm:leading-8 md:mt-9 md:text-[0.9375rem] [&_strong]:font-semibold [&_strong]:text-white">
           <p>
             O <strong>Foice e Filme</strong> nasce de uma iniciativa inspirada nos ideais comunistas de democratização do acesso à cultura, fundamentada na convicção de que o conhecimento, a arte e o entretenimento são patrimônios da humanidade e não devem ser privilégios reservados àqueles que podem pagar por eles.
           </p>

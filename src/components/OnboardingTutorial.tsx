@@ -9,6 +9,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { UserProfile } from "@/contexts/AuthContext";
+import { useCookieConsent } from "@/hooks/use-cookie-consent";
+import { canStoreFunctionalData } from "@/lib/cookieConsent";
+const seenThisVisit = new Set<string>();
 
 interface OnboardingTutorialProps {
   userId?: string | null;
@@ -36,21 +39,26 @@ const tutorialItems = [
 ];
 
 const OnboardingTutorial = ({ userId, activeProfile }: OnboardingTutorialProps) => {
+  const consent = useCookieConsent();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (!userId || !activeProfile?.id) return;
+    if (!userId || !activeProfile?.id || !consent) return;
 
     const key = getTutorialKey(userId, activeProfile.id);
-    if (localStorage.getItem(key)) return;
+    let saved = false;
+    try { saved = canStoreFunctionalData() && !!localStorage.getItem(key); } catch { /* storage unavailable */ }
+    if (saved || seenThisVisit.has(key)) { setOpen(false); return; }
 
     const timer = window.setTimeout(() => setOpen(true), 700);
     return () => window.clearTimeout(timer);
-  }, [activeProfile?.id, userId]);
+  }, [activeProfile?.id, userId, consent]);
 
   const closeTutorial = () => {
     if (userId && activeProfile?.id) {
-      localStorage.setItem(getTutorialKey(userId, activeProfile.id), "seen");
+      const key = getTutorialKey(userId, activeProfile.id);
+      seenThisVisit.add(key);
+      try { if (canStoreFunctionalData()) localStorage.setItem(key, "seen"); } catch { /* storage unavailable */ }
     }
     setOpen(false);
   };

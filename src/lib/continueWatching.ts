@@ -1,4 +1,5 @@
 import { Movie } from "@/lib/tmdb";
+import { canStoreFunctionalData, getCookieConsent, subscribeCookieConsent } from "@/lib/cookieConsent";
 
 const COOKIE_NAME = "crisflix_continue";
 const MAX_ITEMS = 8;
@@ -24,6 +25,7 @@ export interface ContinueWatchingEntry {
 }
 
 const STORAGE_KEY = "foice-filme:guest-progress:v2";
+let visitProgress: ContinueWatchingEntry[] = [];
 
 export function validateContinueWatching(value: unknown): ContinueWatchingEntry[] {
   if (!Array.isArray(value)) return [];
@@ -58,10 +60,17 @@ export function clearLegacyProgressCookie() {
 export function getContinueWatching() {
   if (typeof document === "undefined") return [];
   clearLegacyProgressCookie();
+  if (!canStoreFunctionalData()) return [...visitProgress];
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw && raw.length <= 50000 ? validateContinueWatching(JSON.parse(raw)) : [];
-  } catch { return []; }
+    const stored = raw && raw.length <= 50000 ? validateContinueWatching(JSON.parse(raw)) : [];
+    const seen = new Set<string>();
+    return [...visitProgress, ...stored].sort((a, b) => b.updatedAt - a.updatedAt).filter((item) => {
+      const key = `${item.type}:${item.id}`;
+      if (seen.has(key)) return false;
+      seen.add(key); return true;
+    }).slice(0, MAX_ITEMS);
+  } catch { return [...visitProgress]; }
 }
 
 export function getContinueWatchingItem(type: "movie" | "tv", id: number) {
@@ -71,9 +80,17 @@ export function getContinueWatchingItem(type: "movie" | "tv", id: number) {
 export function saveContinueWatching(entry: ContinueWatchingEntry) {
   const current = getContinueWatching().filter((item) => !(item.type === entry.type && item.id === entry.id));
   const next = validateContinueWatching([entry, ...current]);
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* storage disabled or full */ }
+  visitProgress = next;
+  try { if (canStoreFunctionalData()) localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); } catch { /* storage disabled or full */ }
   window.dispatchEvent(new CustomEvent("continue-watching-updated"));
 }
+subscribeCookieConsent(() => {
+  try {
+    if (canStoreFunctionalData()) localStorage.setItem(STORAGE_KEY, JSON.stringify(getContinueWatching()));
+    else if (getCookieConsent()?.functional === false) localStorage.removeItem(STORAGE_KEY);
+  } catch { /* storage unavailable */ }
+  if (typeof window !== "undefined") window.dispatchEvent(new CustomEvent("continue-watching-updated"));
+});
 
 export function toMovieCardItem(entry: ContinueWatchingEntry): Movie {
   return {

@@ -67,7 +67,7 @@ const Browse = () => {
           <div className="genre-filters -mx-1 mt-4 flex gap-2 overflow-x-auto px-1 pb-1 md:mx-0 md:mt-8 md:flex-wrap md:gap-3 md:overflow-visible">
             <button
               onClick={() => setSearchParams({})}
-              className={`min-h-11 shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-[11px] md:px-4 md:text-sm transition-colors ${
+              className={`min-h-11 shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-[0.6875rem] md:px-4 md:text-sm transition-colors ${
                 !selectedGenre ? "bg-primary text-white" : "bg-white/8 text-white/74 hover:bg-white/12"
               }`}
             >
@@ -77,7 +77,7 @@ const Browse = () => {
               <button
                 key={genre.id}
                 onClick={() => setSearchParams({ genre: String(genre.id) })}
-                className={`min-h-11 shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-[11px] md:px-4 md:text-sm transition-colors ${
+                className={`min-h-11 shrink-0 whitespace-nowrap rounded-full px-3 py-2 text-[0.6875rem] md:px-4 md:text-sm transition-colors ${
                   String(genre.id) === selectedGenre ? "bg-primary text-white" : "bg-white/8 text-white/74 hover:bg-white/12"
                 }`}
               >

@@ -67,7 +67,7 @@ const MyListPage = () => {
       <main className="px-4 pb-16 pt-24 md:px-12 md:pt-28">
         <section className="mx-auto max-w-7xl space-y-10">
           <div>
-            <p className="text-[11px] uppercase tracking-[0.34em] text-primary/80 md:text-sm md:tracking-[0.35em]">Biblioteca</p>
+            <p className="text-[0.6875rem] uppercase tracking-[0.34em] text-primary/80 md:text-sm md:tracking-[0.35em]">Biblioteca</p>
             <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl md:text-5xl">Minha lista</h1>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-white/62 md:text-base">
               Reúna aqui os títulos que você quer ver depois e os seus favoritos.

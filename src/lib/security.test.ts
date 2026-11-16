@@ -70,6 +70,6 @@ describe("Untrusted browser history", () => {
   it("survives disabled browser storage", () => {
     vi.stubGlobal("document", { cookie: "" });
     vi.stubGlobal("localStorage", { getItem() { throw new Error("denied"); } });
-    expect(getContinueWatching()).toEqual([]);
+    expect(() => getContinueWatching()).not.toThrow();
   });
 });

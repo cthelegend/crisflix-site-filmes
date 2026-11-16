@@ -1,3 +1,5 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
+import { preferredStartPath } from "@/lib/sitePreferences";
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { ArrowLeft, Check, LogOut, Pencil, Plus, RefreshCw, UserCircle2 } from "lucide-react";
@@ -11,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 export default function ProfilePage() {
   const { loading, profiles, profilesError, activeProfile, selectProfile, refreshProfile, signOut, user } = useAuth();
   const navigate = useNavigate();
+  const { preferences } = useSitePreferences();
   const [managing, setManaging] = useState(false);
   const [editor, setEditor] = useState<UserProfile | "new" | null>(null);
   const [busy, setBusy] = useState(false);
@@ -38,14 +41,14 @@ export default function ProfilePage() {
       </div> : <div className="my-9 flex w-full flex-wrap items-start justify-center gap-x-5 gap-y-7 sm:my-12 sm:gap-9">
         {profiles.map((item) => <button key={item.id} type="button" aria-label={managing ? `Editar perfil ${item.display_name}` : `Usar perfil ${item.display_name}`} onClick={() => {
           if (managing) setEditor(item);
-          else { selectProfile(item); navigate("/"); }
+          else { selectProfile(item); navigate(preferredStartPath(preferences.startPage, true)); }
         }} className="group flex w-24 min-w-0 flex-col items-center text-center sm:w-32">
           <span className={`relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-3xl border-2 bg-white/5 transition-colors group-hover:border-white/65 sm:h-32 sm:w-32 ${activeProfile?.id === item.id ? "border-primary" : "border-white/10"}`}>
             {item.avatar_url ? <img src={item.avatar_url} alt="" className="h-full w-full object-cover" /> : <UserCircle2 size={48} className="text-white/65" />}
             {managing && <span className="absolute inset-0 flex items-center justify-center bg-black/40"><Pencil size={26} className="text-white" /></span>}
           </span>
           <span className="mt-3 w-full break-words text-sm font-medium text-white/85 sm:text-base">{item.display_name}</span>
-          {activeProfile?.id === item.id && <span className="mt-1 inline-flex items-center gap-1 text-[10px] text-white/40"><Check size={11} />Em uso</span>}
+          {activeProfile?.id === item.id && <span className="mt-1 inline-flex items-center gap-1 text-[0.625rem] text-white/40"><Check size={11} />Em uso</span>}
         </button>)}
         {profiles.length < 3 && <button type="button" aria-label="Adicionar perfil" onClick={() => setEditor("new")} className="group flex w-24 flex-col items-center text-center sm:w-32">
           <span className="flex h-24 w-24 items-center justify-center rounded-3xl border-2 border-dashed border-white/20 bg-white/[0.02] text-white/45 transition-colors group-hover:border-primary/70 group-hover:text-primary sm:h-32 sm:w-32"><Plus size={36} strokeWidth={1.5} /></span>
@@ -53,7 +56,7 @@ export default function ProfilePage() {
         </button>}
       </div>}
       {!loading && !profilesError && <>
-        <p className="mb-5 text-[11px] text-white/35">{profiles.length} de 3 perfis</p>
+        <p className="mb-5 text-[0.6875rem] text-white/35">{profiles.length} de 3 perfis</p>
         <Button type="button" onClick={() => setManaging((value) => !value)} className="h-11 rounded-full border border-white/25 bg-transparent px-6 text-xs text-white hover:bg-white/10">{managing ? "Concluir" : "Gerenciar perfis"}</Button>
       </>}
       <div className="mt-7 flex flex-wrap justify-center gap-5 text-xs text-white/50">

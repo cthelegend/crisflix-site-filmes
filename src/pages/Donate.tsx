@@ -11,7 +11,7 @@ const Donate = () => {
         <section className="mx-auto max-w-6xl rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 sm:p-7 md:p-10">
           <div className="grid gap-8 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
             <div>
-              <p className="text-[11px] uppercase tracking-[0.34em] text-primary/80 md:text-sm md:tracking-[0.35em]">Apoio</p>
+              <p className="text-[0.6875rem] uppercase tracking-[0.34em] text-primary/80 md:text-sm md:tracking-[0.35em]">Apoio</p>
               <h1 className="mt-3 text-3xl font-bold text-white sm:text-4xl md:text-5xl">Ajude a manter o projeto no ar</h1>
               <p className="mt-5 text-sm leading-7 text-white/68 md:text-base">
                 O FOICE & FILME é um projeto sem fins lucrativos. Se você gosta da proposta e quer ajudar com custos de manutenção,

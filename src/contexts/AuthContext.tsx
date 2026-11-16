@@ -1,3 +1,4 @@
+import { LEGAL_VERSION } from "@/lib/legal";
 import { createContext, ReactNode, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
 import { prepareAvatar, safeAvatarUrl, validateDisplayName } from "@/lib/security";
@@ -21,7 +22,7 @@ interface AuthContextValue {
   loading: boolean;
   configured: boolean;
   signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, displayName: string) => Promise<void>;
+  signUp: (email: string, password: string, displayName: string, acceptedTerms: boolean) => Promise<void>;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   selectProfile: (profile: UserProfile) => void;
@@ -151,12 +152,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (error) throw error;
     },
-    signUp: async (email, password, displayName) => {
+    signUp: async (email, password, displayName, acceptedTerms) => {
+      if (!acceptedTerms) throw new Error("Aceite os Termos de Serviço para criar sua conta.");
       if (!supabase) throw new Error("Supabase não configurado.");
       const name = validateDisplayName(displayName);
       if (password.length < 12 || password.length > 128) throw new Error("Use uma senha entre 12 e 128 caracteres.");
       const { error } = await supabase.auth.signUp({ email: email.trim(), password,
-        options: { data: { display_name: name }, emailRedirectTo: `${window.location.origin}/profile` },
+        options: { data: { display_name: name, terms_version: LEGAL_VERSION, terms_accepted_at: new Date().toISOString() }, emailRedirectTo: `${window.location.origin}/profile` },
       });
       if (error) throw error;
     },

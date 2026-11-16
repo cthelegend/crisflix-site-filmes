@@ -1,6 +1,6 @@
 import Brand from "@/components/Brand";
 import { FormEvent, KeyboardEvent, useRef, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -35,6 +35,7 @@ const AuthPage = () => {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
   const emailInputRef = useRef<HTMLInputElement>(null);
@@ -48,6 +49,7 @@ const AuthPage = () => {
 
   const switchMode = (nextMode: "login" | "signup") => {
     setMode(nextMode);
+    setAcceptedTerms(false);
     window.setTimeout(() => {
       if (nextMode === "signup") {
         nameInputRef.current?.focus();
@@ -67,6 +69,7 @@ const AuthPage = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (submitting) return;
+    if (mode === "signup" && !acceptedTerms) { toast.error("Aceite os Termos de Serviço para criar sua conta."); return; }
     setSubmitting(true);
 
     try {
@@ -74,7 +77,7 @@ const AuthPage = () => {
         await signIn(email, password);
         toast.success("Login realizado com sucesso.");
       } else {
-        await signUp(email, password, displayName.trim());
+        await signUp(email, password, displayName.trim(), acceptedTerms);
         toast.success("Confira seu e-mail para continuar o cadastro, se necessário.");
       }
 
@@ -125,9 +128,9 @@ const AuthPage = () => {
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             {mode === "signup" && (
               <div>
-                <label className="mb-2 block text-sm text-white/70">Nome do perfil</label>
+                <label htmlFor="signup-name" className="mb-2 block text-sm text-white/70">Nome do perfil</label>
                 <Input
-                  ref={nameInputRef}
+                  id="signup-name" ref={nameInputRef}
                   maxLength={80}
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
@@ -139,9 +142,9 @@ const AuthPage = () => {
             )}
 
             <div>
-              <label className="mb-2 block text-sm text-white/70">E-mail</label>
+              <label htmlFor="auth-email" className="mb-2 block text-sm text-white/70">E-mail</label>
               <Input
-                ref={emailInputRef}
+                id="auth-email" ref={emailInputRef}
                 type="email"
                 maxLength={254}
                 autoComplete="email"
@@ -154,9 +157,9 @@ const AuthPage = () => {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm text-white/70">Senha</label>
+              <label htmlFor="auth-password" className="mb-2 block text-sm text-white/70">Senha</label>
               <Input
-                ref={passwordInputRef}
+                id="auth-password" ref={passwordInputRef}
                 type="password"
                 autoComplete={mode === "signup" ? "new-password" : "current-password"}
                 value={password}
@@ -168,9 +171,13 @@ const AuthPage = () => {
               />
             </div>
 
+            {mode === "signup" && <div className="flex items-start gap-3">
+              <input id="signup-terms" type="checkbox" checked={acceptedTerms} onChange={(event) => setAcceptedTerms(event.target.checked)} required disabled={submitting} className="mt-1 h-4 w-4 shrink-0 accent-red-600" />
+              <label htmlFor="signup-terms" className="text-xs leading-6 text-white/65">Li e aceito os <Link to="/termos" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-4">Termos de Serviço</Link> e estou ciente da <Link to="/privacidade" target="_blank" rel="noopener noreferrer" className="text-white underline underline-offset-4">Política de Privacidade</Link>.</label>
+            </div>}
             <Button
               type="submit"
-              disabled={submitting || !configured}
+              disabled={submitting || !configured || mode === "signup" && !acceptedTerms}
               className="mt-2 h-12 w-full rounded-full border border-primary bg-primary px-7 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {submitting ? "Carregando..." : mode === "login" ? "Entrar" : "Criar conta"}

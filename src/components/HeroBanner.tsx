@@ -1,41 +1,61 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Info, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Movie, getBackdropUrl, getTrending } from "@/lib/tmdb";
 
-const HERO_ROTATION_MS = 5500;
+import { useSiteContent } from "@/contexts/SiteContentContext";
+import { resolveMedia } from "@/lib/siteContent";
 const MAX_SLIDES = 5;
 
 const HeroBanner = ({ onReady, paused = false }: { onReady?: (ready: boolean) => void; paused?: boolean }) => {
+  const { preferences, reducedMotion } = useSitePreferences();
+  const { content, ready } = useSiteContent();
+  const [visited, setVisited] = useState<number[]>([0]);
   const [items, setItems] = useState<Movie[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     let cancelled = false;
-    getTrending().then((data) => {
+    if (!ready) return;
+    onReady?.(false);
+    const chosen = content.highlights.filter(h => h.enabled);
+    const load = async () => {
+      if (!chosen.length) return (await getTrending()).results;
+      const resolved = await resolveMedia(chosen);
+      if (!resolved.length) return (await getTrending()).results;
+      return resolved.map(item => {
+        const custom = chosen.find(ref => ref.tmdbId === item.id && ref.type === item.media_type);
+        return custom?.subtitle ? { ...item, overview: custom.subtitle } : item;
+      });
+    };
+    load().then((results) => {
       if (cancelled) return;
-      const featuredItems = data.results
+      const featuredItems = results
         .filter((item) => item.backdrop_path && (item.title || item.name))
-        .slice(0, MAX_SLIDES);
+        .slice(0, chosen.length ? 12 : MAX_SLIDES);
 
       setItems(featuredItems);
       setActiveIndex(0);
+      setVisited([0]);
     }).catch(() => { if (!cancelled) setItems([]); })
       .finally(() => { if (!cancelled) onReady?.(true); });
     return () => { cancelled = true; };
-  }, [onReady]);
+  }, [onReady, ready, content.highlights]);
+
+  useEffect(() => { setVisited((current) => current.includes(activeIndex) ? current : [...current, activeIndex]); }, [activeIndex]);
 
   useEffect(() => {
-    if (items.length <= 1 || paused) return;
+    if (items.length <= 1 || paused || !preferences.rotateHighlights || reducedMotion) return;
 
     const interval = window.setInterval(() => {
       setActiveIndex((current) => (current + 1) % items.length);
-    }, HERO_ROTATION_MS);
+    }, content.appearance.heroSeconds * 1000);
 
     return () => window.clearInterval(interval);
-  }, [items.length, paused]);
+  }, [items.length, paused, preferences.rotateHighlights, reducedMotion, content.appearance.heroSeconds]);
 
   const featured = useMemo(() => items[activeIndex] || null, [activeIndex, items]);
 
@@ -66,7 +86,7 @@ const HeroBanner = ({ onReady, paused = false }: { onReady?: (ready: boolean) =>
           <div
             data-hero-backdrop={index === activeIndex ? "active" : undefined}
             className="absolute inset-0 scale-[1.03] bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${getBackdropUrl(item.backdrop_path)})` }}
+            style={{ backgroundImage: !preferences.saveData || index === activeIndex || visited.includes(index) ? `url(${getBackdropUrl(item.backdrop_path)})` : undefined }}
           />
         </div>
       ))}
@@ -77,7 +97,7 @@ const HeroBanner = ({ onReady, paused = false }: { onReady?: (ready: boolean) =>
 
       <div className="relative z-10 flex min-h-[78svh] items-end px-4 pb-20 pt-28 md:min-h-[92svh] md:px-12 md:pb-28">
         <div className="max-w-2xl">
-          <p className="mb-4 text-[11px] uppercase tracking-[0.34em] text-white/65 animate-fade-in md:text-xs md:tracking-[0.42em]">
+          <p className="mb-4 text-[0.6875rem] uppercase tracking-[0.34em] text-white/65 animate-fade-in md:text-xs md:tracking-[0.42em]">
             {isMovie ? "Filme em destaque" : "Série em destaque"} {year ? `• ${year}` : ""}
           </p>
           <h1 className="max-w-[12ch] text-[2rem] font-bold leading-[1.05] tracking-tight text-white text-shadow animate-slide-in sm:text-5xl md:max-w-xl md:text-7xl">
@@ -90,14 +110,14 @@ const HeroBanner = ({ onReady, paused = false }: { onReady?: (ready: boolean) =>
           <div className="hero-actions mt-5 grid grid-cols-2 gap-2 animate-fade-in sm:flex sm:flex-wrap md:mt-7 md:gap-3">
             <Button
               onClick={() => navigate(`/watch/${type}/${featured.id}`)}
-              className="hero-button h-11 rounded-full px-3 text-[11px] font-semibold md:h-12 md:px-7 md:text-sm"
+              className="hero-button h-11 rounded-full px-3 text-[0.6875rem] font-semibold md:h-12 md:px-7 md:text-sm"
             >
               <Play size={18} fill="currentColor" /> Assistir agora
             </Button>
             <Button
               onClick={() => navigate(`/details/${type}/${featured.id}`)}
               variant="secondary"
-              className="hero-button hero-button-secondary h-11 rounded-full px-3 text-[11px] font-semibold md:h-12 md:px-7 md:text-sm"
+              className="hero-button hero-button-secondary h-11 rounded-full px-3 text-[0.6875rem] font-semibold md:h-12 md:px-7 md:text-sm"
             >
               <Info size={18} /> Mais informações
             </Button>

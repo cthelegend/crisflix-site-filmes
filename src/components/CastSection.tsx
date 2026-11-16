@@ -1,3 +1,4 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight, UserRound } from "lucide-react";
 import { CastMember, getImageUrl } from "@/lib/tmdb";
@@ -20,12 +21,13 @@ function CastPortrait({ person }: { person: CastMember }) {
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/25 to-transparent" />
       </div>
       <p className="mt-2.5 line-clamp-2 text-xs font-semibold leading-[1.4] text-white/90 md:text-sm">{person.name}</p>
-      <p className="mt-1 line-clamp-2 text-[10px] leading-[1.5] text-white/45 md:text-xs">{person.character || "Participação no elenco"}</p>
+      <p className="mt-1 line-clamp-2 text-[0.625rem] leading-[1.5] text-white/45 md:text-xs">{person.character || "Participação no elenco"}</p>
     </li>
   );
 }
 
 const CastSection = ({ cast }: { cast: CastMember[] }) => {
+  const { reducedMotion } = useSitePreferences();
   const ref = useRef<HTMLUListElement>(null);
   const [canBack, setCanBack] = useState(false);
   const [canNext, setCanNext] = useState(false);
@@ -42,7 +44,7 @@ const CastSection = ({ cast }: { cast: CastMember[] }) => {
     resize.observe(row);
     return () => { row.removeEventListener("scroll", update); resize.disconnect(); };
   }, [cast]);
-  const scroll = (direction: number) => ref.current?.scrollBy({ left: direction * ref.current.clientWidth * 0.75, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth" });
+  const scroll = (direction: number) => ref.current?.scrollBy({ left: direction * ref.current.clientWidth * 0.75, behavior: reducedMotion ? "instant" : "smooth" });
 
   return (
     <section className="cast-section mt-8 min-w-0 md:mt-10" aria-labelledby="cast-heading">
@@ -50,7 +52,7 @@ const CastSection = ({ cast }: { cast: CastMember[] }) => {
         <div className="flex items-center gap-3">
           <span className="h-5 w-[3px] rounded-full bg-primary" aria-hidden="true" />
           <h2 id="cast-heading" className="text-lg font-semibold tracking-tight text-white md:text-2xl">Elenco</h2>
-          {!!cast.length && <span className="rounded-full border border-white/10 px-2 py-0.5 text-[10px] tabular-nums text-white/45">{cast.length}</span>}
+          {!!cast.length && <span className="rounded-full border border-white/10 px-2 py-0.5 text-[0.625rem] tabular-nums text-white/45">{cast.length}</span>}
         </div>
         <div className="hidden gap-2 md:flex">
           <button type="button" aria-label="Ver elenco anterior" onClick={() => scroll(-1)} disabled={!canBack}

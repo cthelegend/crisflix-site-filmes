@@ -1,5 +1,8 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Navigate } from "react-router-dom";
+import EditorialRows from "@/components/EditorialRows";
+import { useSiteContent } from "@/contexts/SiteContentContext";
 import ContinueWatchingRow from "@/components/ContinueWatchingRow";
 import HeroBanner from "@/components/HeroBanner";
 import MovieRow from "@/components/MovieRow";
@@ -83,19 +86,19 @@ function getVarietyScore(item: Movie, rowTitle: string) {
   return (item.id * 9301 + titleScore * 49297 + SESSION_VARIETY_SEED * 233) % 233280;
 }
 
-async function fetchRowPool(definition: HomeRowDefinition) {
-  const pageResults = await Promise.allSettled(PAGES_PER_SECTION.map((page) => definition.fetchPage(page)));
+async function fetchRowPool(definition: HomeRowDefinition, saveData: boolean) {
+  const pageResults = await Promise.allSettled((saveData ? [1] : PAGES_PER_SECTION).map((page) => definition.fetchPage(page)));
 
   return pageResults.flatMap((result) => (result.status === "fulfilled" ? result.value.results : []));
 }
 
-async function buildVariedRows() {
+async function buildVariedRows(saveData: boolean) {
   const seen = new Set<string>();
   const rows: HomeRow[] = [];
   const pools = await Promise.all(
     homeRowDefinitions.map(async (definition) => ({
       definition,
-      pool: await fetchRowPool(definition),
+      pool: await fetchRowPool(definition, saveData),
     })),
   );
 
@@ -114,7 +117,7 @@ async function buildVariedRows() {
       rowSeen.add(key);
       uniqueItems.push({ ...item, media_type: item.media_type || definition.type });
 
-      if (uniqueItems.length >= ITEMS_PER_ROW) break;
+      if (uniqueItems.length >= (saveData ? 8 : ITEMS_PER_ROW)) break;
     }
 
     uniqueItems.forEach((item) => seen.add(getItemKey(item, definition.type)));
@@ -128,6 +131,8 @@ async function buildVariedRows() {
 }
 
 const Index = () => {
+  const { content } = useSiteContent();
+  const { preferences } = useSitePreferences();
   const { activeProfile, configured, loading, user } = useAuth();
   const [watchlist, setWatchlist] = useState<UserMediaState[]>([]);
   const [homeRows, setHomeRows] = useState<HomeRow[]>([]);
@@ -148,7 +153,9 @@ const Index = () => {
   useEffect(() => {
     let cancelled = false;
 
-    buildVariedRows()
+    if (!content.appearance.showDefaultRows) { setHomeRows([]); setRowsReady(true); return; }
+    setRowsReady(false);
+    buildVariedRows(preferences.saveData)
       .then((rows) => {
         if (!cancelled) setHomeRows(rows);
       })
@@ -162,7 +169,7 @@ const Index = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [preferences.saveData, content.appearance.showDefaultRows]);
 
   const watchlistItems = useMemo(() => watchlist.map(toMovieItem), [watchlist]);
 
@@ -179,6 +186,7 @@ const Index = () => {
 
         <main className="-mt-20 relative z-10 pb-16 md:-mt-24">
           <ContinueWatchingRow />
+          <EditorialRows />
           {watchlistItems.length > 0 && <MovieRow title="Minha Lista" items={watchlistItems} />}
           {homeRows.map((row) => (
             <MovieRow key={row.title} title={row.title} items={row.items} type={row.type} />

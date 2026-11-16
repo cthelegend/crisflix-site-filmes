@@ -1,3 +1,4 @@
+import { useSitePreferences } from "@/contexts/SitePreferencesContext";
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Movie } from "@/lib/tmdb";
@@ -11,6 +12,7 @@ interface MovieRowProps {
 }
 
 const MovieRow = ({ title, fetchFn, items: initialItems, type }: MovieRowProps) => {
+  const { reducedMotion } = useSitePreferences();
   const [items, setItems] = useState<Movie[]>(initialItems || []);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -27,7 +29,7 @@ const MovieRow = ({ title, fetchFn, items: initialItems, type }: MovieRowProps) 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     const amount = scrollRef.current.clientWidth * 0.82;
-    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: reducedMotion ? "auto" : "smooth" });
   };
 
   if (!items.length) return null;

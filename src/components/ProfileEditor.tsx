@@ -64,7 +64,7 @@ export default function ProfileEditor({ profile, onSaved, onCancel }: Props) {
       <div className="flex flex-col items-center gap-4 sm:flex-row">
         <label className="relative flex h-24 w-24 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-white/15 bg-white/5 focus-within:ring-2 focus-within:ring-primary">
           {preview || avatar ? <img src={preview || avatar} alt="Prévia do avatar" className="h-full w-full object-cover" /> : <UserCircle2 size={44} />}
-          <span className="absolute inset-x-0 bottom-0 flex min-h-7 items-center justify-center gap-1 bg-black/75 px-1 text-[10px] text-white"><Camera size={12} />{preparingPhoto ? "Preparando..." : "Enviar foto"}</span>
+          <span className="absolute inset-x-0 bottom-0 flex min-h-7 items-center justify-center gap-1 bg-black/75 px-1 text-[0.625rem] text-white"><Camera size={12} />{preparingPhoto ? "Preparando..." : "Enviar foto"}</span>
           <input type="file" aria-label="Enviar foto do perfil" accept="image/png,image/jpeg,image/webp" className="sr-only" disabled={saving || preparingPhoto} onChange={chooseFile} />
         </label>
         <div className="w-full flex-1">

@@ -1,11 +1,12 @@
+import { getSitePreferences } from "@/lib/sitePreferences";
 const IMG_BASE = "https://image.tmdb.org/t/p";
 
 
 export const getImageUrl = (path: string | null, size = "w500") =>
-  path ? `${IMG_BASE}/${size}${path}` : "/placeholder.svg";
+  path ? `${IMG_BASE}/${getSitePreferences().saveData ? "w185" : size}${path}` : "/placeholder.svg";
 
 export const getBackdropUrl = (path: string | null) =>
-  path ? `${IMG_BASE}/original${path}` : null;
+  path ? `${IMG_BASE}/${getSitePreferences().saveData ? "w780" : "original"}${path}` : null;
 
 export const formatDisplayedRating = (voteAverage?: number) =>
   voteAverage && voteAverage > 0 ? voteAverage.toFixed(1) : "N/D";
@@ -149,6 +150,9 @@ export const getMovieDetails = (id: number) =>
 
 export const getTVDetails = (id: number) =>
   fetchTMDB<MovieDetails>(`/tv/${id}`, { append_to_response: "external_ids,credits" });
+
+// Editorial cards do not need cast, crew or external IDs.
+export const getEditorialMedia = (type: "movie" | "tv", id: number) => fetchTMDB<Movie>(`/${type}/${id}`);
 
 export const getTVSeason = (tvId: number, seasonNumber: number) =>
   fetchTMDB<Season>(`/tv/${tvId}/season/${seasonNumber}`);
